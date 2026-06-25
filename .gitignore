@@ -25,6 +25,8 @@ reports/
 tools/data/competitors.json
 tools/case-db/real_crowdfunding_cases.json
 tools/iteration_history.json
+tools/iterations/
+tools/extracted_product_info.txt
 
 # 系统文件
 .DS_Store

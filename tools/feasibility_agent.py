@@ -243,7 +243,8 @@ class RuleBasedExtractor:
     @staticmethod
     def _identify_category(text: str) -> str:
         text_lower = text.lower()
-        if any(k in text_lower for k in ['app', '应用', '软件', 'saas', '订阅']):
+        # 注意：订阅制是很多品类共有的商业模式，不作为saas的判定依据
+        if any(k in text_lower for k in ['app', '应用', '软件', 'saas']):
             return 'saas'
         if any(k in text_lower for k in ['服务', '咨询', '培训', '代运营']):
             return 'service'
@@ -251,7 +252,7 @@ class RuleBasedExtractor:
             return 'content'
         if any(k in text_lower for k in ['社群', '社区', '会员', '俱乐部']):
             return 'community'
-        if any(k in text_lower for k in ['平台', 'marketplace', '撮合', '连接']):
+        if any(k in text_lower for k in ['marketplace', '撮合', '连接多方', '双边', '平台商', '平台化']):
             return 'platform'
         if any(k in text_lower for k in ['b2b', '企业', '商家', '批发', '供应链']):
             return 'b2b'
@@ -491,19 +492,23 @@ class FeasibilityAgent:
             return 'service'
         if any(k in description for k in ['社群', '社区', '会员', '俱乐部']):
             return 'community'
-        if any(k in description for k in ['平台', 'marketplace', '撮合', '连接']):
+        if any(k in description for k in ['marketplace', '撮合', '连接多方', '双边', '平台商', '平台化']):
             return 'platform'
         if any(k in description for k in ['b2b', '企业', '商家', '批发', '供应链']):
             return 'b2b'
         
         # 回退到关键词打分系统
+        # 先检测明确的硬件关键词（最高优先级）
+        if any(k in description for k in ['耳机', '手表', '手环', '眼镜', '戒指', '相机', '打印机', '投影仪', '机器人', '扫地机', '割草机', '传感器', '芯片', '电路板']):
+            return 'hardware'
+        
         keywords = {
             'saas': ['订阅', '云端', 'saas', '软件', 'app', '工具', 'crm', '协作'],
             'hardware': ['硬件', '实体', '3d打印', '机器人', '智能', '设备', '芯片', '传感器', 'ai硬件'],
             'service': ['服务', '咨询', '代运营', '培训', '1v1', '定制', '人力'],
             'content': ['内容', '社群', '陪伴', '情感', '娱乐', '粉丝', '会员', '创作者'],
             'b2b': ['企业', 'b2b', '采购', 'poc', '决策链', '集成', '部署'],
-            'platform': ['平台', '双边', '网络效应', '供需', '匹配', '交易'],
+            'platform': ['marketplace', '双边', '网络效应', '供需', '匹配', '交易平台'],
         }
         
         scores = {}
@@ -954,11 +959,50 @@ class FeasibilityAgent:
         with open(html_file, 'w', encoding='utf-8') as f:
             f.write(html_content)
         
-        return {
+        saved = {
             'json_report': report_file,
             'markdown_report': md_file,
             'html_report': html_file,
         }
+        
+        # 生成PDF报告（通过系统Edge浏览器将HTML转为PDF）
+        try:
+            try:
+                from playwright.sync_api import sync_playwright
+                pdf_file_path = os.path.join(report_dir, f'{safe_name}-完整可行性分析.pdf')
+                
+                with sync_playwright() as p:
+                    # 优先使用系统Edge浏览器，无需下载Chromium
+                    browser_kwargs = {'headless': True}
+                    browser = None
+                    for channel in [None, 'msedge', 'chrome']:
+                        try:
+                            if channel:
+                                browser = p.chromium.launch(channel=channel, **browser_kwargs)
+                            else:
+                                browser = p.chromium.launch(**browser_kwargs)
+                            break
+                        except Exception:
+                            continue
+                    
+                    if browser is None:
+                        raise RuntimeError("无法启动浏览器")
+                    
+                    page = browser.new_page()
+                    page.goto(f'file:///{html_file}', wait_until='domcontentloaded', timeout=30000)
+                    page.wait_for_timeout(2000)  # 等待图表渲染
+                    page.pdf(path=pdf_file_path, format='A4', print_background=True)
+                    browser.close()
+                
+                saved['pdf_report'] = pdf_file_path
+                print(f"PDF报告已生成: {pdf_file_path}")
+            except ImportError:
+                print("提示: 安装 playwright (pip install playwright && playwright install chromium) 可自动生成PDF报告")
+                print("      或者在浏览器中打开HTML报告，按 Ctrl+P 打印为PDF")
+        except Exception as e:
+            print(f"PDF生成失败: {e}")
+        
+        return saved
     
     def record_iteration(self, report: Dict):
         """记录迭代历史"""

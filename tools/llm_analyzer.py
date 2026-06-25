@@ -538,7 +538,6 @@ class LLMAnalyzer:
             elif os.environ.get("ANTHROPIC_API_KEY"):
                 return ClaudeClient()
             else:
-                print("未检测到API密钥，使用本地模型客户端（需要本地模型服务）")
                 return LocalLLMClient()
         else:
             raise ValueError(f"不支持的LLM提供商: {provider}")

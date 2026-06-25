@@ -263,60 +263,63 @@ class FullReportGenerator:
         }
     
     def generate_full_report(self, analysis_data: Dict) -> str:
-        """生成完整的募资可行性分析Markdown报告"""
+        """生成完整的可行性分析Markdown报告"""
         sections = []
         
-        # 0. 执行摘要（募资视角）
+        # ======== 第0章：执行摘要 ========
         sections.append(self._generate_executive_summary(analysis_data))
         
-        # 1. 项目画像识别
+        # ======== 第1章：项目画像识别 ========
         sections.append(self._generate_project_profile(analysis_data))
         
-        # 2. 募资可行性评分（核心章节）
-        sections.append(self._generate_crowdfunding_scoring(analysis_data))
-        
-        # 3. 平台选择与匹配分析
-        sections.append(self._generate_crowdfunding_platform_analysis(analysis_data))
-        
-        # 4. 竞品案例与募资表现
-        sections.append(self._generate_competitor_case_study(analysis_data))
-        
-        # 5. 募资定价策略
-        sections.append(self._generate_crowdfunding_pricing(analysis_data))
-        
-        # 6. 推广策略与时间线
-        sections.append(self._generate_crowdfunding_promotion(analysis_data))
-        
-        # 7. 平台审核准备清单
-        sections.append(self._generate_crowdfunding_checklist(analysis_data))
-        
-        # 8. SWOT分析（募资视角）
-        sections.append(self._generate_swot_analysis(analysis_data))
-        
-        # 9. 财务模型分析（侧重募资收入）
-        sections.append(self._generate_financial_model(analysis_data))
-        
-        # 10. 市场规模估算（参考）
-        sections.append(self._generate_market_sizing(analysis_data))
-        
-        # 11. 市场分析 + PEST（参考）
+        # ======== 第2-12章：通用分析章节 ========
+        # 2. 市场分析
         sections.append(self._generate_market_analysis(analysis_data))
-        
-        # 12. 商业模式画布（参考）
+        # 3. PEST分析
+        sections.append(self._generate_pest_analysis(analysis_data))
+        # 4. 波特五力分析
+        sections.append(self._generate_porter_five_forces(analysis_data))
+        # 5. SWOT分析
+        sections.append(self._generate_swot_analysis(analysis_data))
+        # 6. 商业模式画布
         sections.append(self._generate_business_model_canvas(analysis_data))
-        
-        # 13. 增长飞轮 + 指标 + 技术（参考）
+        # 7. 竞品案例研究
+        sections.append(self._generate_competitor_case_study(analysis_data))
+        # 8. 市场规模估算
+        sections.append(self._generate_market_sizing(analysis_data))
+        # 9. 财务模型分析
+        sections.append(self._generate_financial_model(analysis_data))
+        # 10. 增长飞轮分析
         sections.append(self._generate_growth_flywheel(analysis_data))
+        # 11. 数据指标框架
         sections.append(self._generate_metrics_framework(analysis_data))
+        # 12. 技术架构评估
         sections.append(self._generate_tech_architecture(analysis_data))
         
-        # 16. 附录（退出策略、时间规划、通用评分）
-        sections.append(self._generate_appendix(analysis_data))
+        # ======== 第13-18章：募资专项分析章节 ========
+        # 13. 募资可行性评分
+        sections.append(self._generate_crowdfunding_scoring(analysis_data))
+        # 14. 平台选择与匹配分析
+        sections.append(self._generate_crowdfunding_platform_analysis(analysis_data))
+        # 15. 募资定价策略
+        sections.append(self._generate_crowdfunding_pricing(analysis_data))
+        # 16. 推广策略与时间线
+        sections.append(self._generate_crowdfunding_promotion(analysis_data))
+        # 17. 平台审核准备清单
+        sections.append(self._generate_crowdfunding_checklist(analysis_data))
+        # 18. 竞品案例与募资表现
+        sections.append(self._generate_crowdfunding_case_performance(analysis_data))
         
-        # 14. 募资行动建议
+        # ======== 第19-23章：评分、规划与建议 ========
+        # 19. 可行性评分（通用评分，10维度）
+        sections.append(self._generate_feasibility_scoring(analysis_data))
+        # 20. 时间规划
+        sections.append(self._generate_timeline(analysis_data))
+        # 21. 退出策略
+        sections.append(self._generate_exit_strategy(analysis_data))
+        # 22. 行动建议
         sections.append(self._generate_action_plan(analysis_data))
-        
-        # 15. 沟通话术
+        # 23. 沟通话术
         sections.append(self._generate_communication_script(analysis_data))
         
         return '\n\n'.join(sections)
@@ -442,17 +445,52 @@ class FullReportGenerator:
         category = data.get('category', 'default')
         market_data = self.market_data.get('ai_hardware', {})
         
-        analysis = f"""# 11. 市场分析 + PEST（参考）
+        analysis = f"""# 2. 市场分析
 
-## 11.1 PEST分析
-| 维度 | 分析 | 影响 |
-| --- | --- | --- |
-| 政治(P) | AI产业政策支持，数据安全法规趋严 | 中等正面 + 需合规 |
-| 经济(E) | AI硬件市场年增长35%，消费升级趋势 | 高正面 |
-| 社会(S) | AI工具教育完成，用户接受度高 | 高正面 |
-| 技术(T) | AI技术成熟，供应链完善 | 高正面 |
+## 2.1 市场概况
+- **全球AI硬件市场**：{market_data.get('global_market_2026', '$800亿')}（{market_data.get('growth_rate', '35%')}年增长）
+- **中国AI硬件市场**：{market_data.get('china_market_2026', '¥2,000亿')}
+- **募资平台表现**：Kickstarter平均募集{market_data.get('kickstarter_avg', '$50万-$100万')}，啧啧平均募集{market_data.get('zeczec_avg', '¥500万-¥1,500万')}
 
-## 11.2 波特五力分析
+## 2.2 市场趋势
+- AI技术普及推动智能硬件需求爆发
+- 消费者对AI产品的接受度和付费意愿持续提升
+- 众筹/募资平台成为硬件创新产品验证市场的重要渠道
+- 跨境募资（出海）成为国内硬件团队的新增长机会"""
+        
+        return analysis
+    
+    def _generate_pest_analysis(self, data: Dict) -> str:
+        """生成PEST分析"""
+        analysis = """# 3. PEST分析
+
+## 3.1 政治因素 (Political)
+- AI产业政策支持，国家大力推动人工智能发展
+- 数据安全法规趋严，对涉及用户数据的AI产品提出更高合规要求
+- 进出口贸易政策影响硬件供应链成本
+
+## 3.2 经济因素 (Economic)
+- AI硬件市场年增长35%，处于快速增长期
+- 消费升级趋势明显，用户愿意为智能化产品付费
+- 供应链成本波动对硬件产品利润空间有直接影响
+
+## 3.3 社会因素 (Social)
+- AI工具教育完成，用户接受度高
+- 远程办公、在线教育等场景催生新需求
+- 环保意识和健康意识提升带动相关智能产品需求
+
+## 3.4 技术因素 (Technological)
+- AI技术成熟，大模型能力持续提升
+- 芯片供应链完善，硬件成本持续下降
+- 5G/物联网基础设施完善，为智能硬件提供连接基础"""
+        
+        return analysis
+    
+    def _generate_porter_five_forces(self, data: Dict) -> str:
+        """生成波特五力分析"""
+        forces = """# 4. 波特五力分析
+
+## 4.1 行业竞争格局
 | 力量 | 分析 | 强度 |
 | --- | --- | --- |
 | 供应商议价能力 | AI芯片供应商集中，议价能力强 | 高 |
@@ -461,35 +499,36 @@ class FullReportGenerator:
 | 替代品威胁 | 手机APP、云端服务替代 | 中 |
 | 行业竞争程度 | 同质化严重，竞争激烈 | 高 |
 
-## 11.3 市场趋势
-- **全球AI硬件市场**：{market_data.get('global_market_2026', '$800亿')}（{market_data.get('growth_rate', '35%')}年增长）
-- **中国AI硬件市场**：{market_data.get('china_market_2026', '¥2,000亿')}
-- **募资平台表现**：Kickstarter平均募集{market_data.get('kickstarter_avg', '$50万-$100万')}，啧啧平均募集{market_data.get('zeczec_avg', '¥500万-¥1,500万')}"""
+## 4.2 竞争态势总结
+- 行业整体竞争强度较高，需要通过技术创新和差异化定位建立壁垒
+- 供应商集中度高的领域需提前布局备选供应链
+- 替代品威胁中等，说明产品本身的价值主张仍然有效
+- 新进入者威胁高意味着需要快速建立品牌认知和用户粘性"""
         
-        return analysis
+        return forces
     
     def _generate_swot_analysis(self, data: Dict) -> str:
         """生成SWOT分析"""
         swot = data.get('swot', {})
         
-        analysis = f"""# 8. SWOT分析（募资视角）
+        analysis = f"""# 5. SWOT分析
 
-## 8.1 优势(Strengths) - 募资视角
+## 5.1 优势(Strengths)
 | 条目 | 影响程度 | 证据强度 | 处理建议 |
 | --- | --- | --- | --- |
 {self._format_swot_items(swot.get('strengths', []))}
 
-## 8.2 劣势(Weaknesses) - 募资视角
+## 5.2 劣势(Weaknesses)
 | 条目 | 影响程度 | 证据强度 | 处理建议 |
 | --- | --- | --- | --- |
 {self._format_swot_items(swot.get('weaknesses', []))}
 
-## 8.3 机会(Opportunities) - 募资视角
+## 5.3 机会(Opportunities)
 | 条目 | 影响程度 | 证据强度 | 处理建议 |
 | --- | --- | --- | --- |
 {self._format_swot_items(swot.get('opportunities', []))}
 
-## 8.4 威胁(Threats) - 募资视角
+## 5.4 威胁(Threats)
 | 条目 | 影响程度 | 证据强度 | 处理建议 |
 | --- | --- | --- | --- |
 {self._format_swot_items(swot.get('threats', []))}"""
@@ -500,7 +539,7 @@ class FullReportGenerator:
         """生成商业模式画布"""
         product = data.get('product', {})
         
-        canvas = f"""# 12. 商业模式画布（参考）
+        canvas = f"""# 6. 商业模式画布
 
 | 模块 | 内容 |
 | --- | --- |
@@ -521,22 +560,22 @@ class FullReportGenerator:
         competitors = data.get('competitor_analysis', {}).get('competitors', [])
         real_cases = data.get('competitor_analysis', {}).get('real_cases', [])
         
-        study = f"""# 4. 竞品案例与募资表现
+        study = f"""# 7. 竞品案例研究
 
-## 4.1 直接竞品
+## 7.1 直接竞品
 | 竞品名称 | 品类 | 核心功能 | 价格 | 与本项目关系 |
 | --- | --- | --- | --- | --- |
 {self._format_competitors(competitors[:5])}
 
-## 4.2 相似募资成功案例
+## 7.2 相似成功案例
 | 案例名称 | 平台 | 募集金额 | 支持者 | 成功因素 |
 | --- | --- | --- | --- | --- |
 {self._format_success_cases(real_cases[:5])}
 
-## 4.3 募资成功因素提炼
+## 7.3 成功因素提炼
 {self._extract_success_factors(real_cases)}
 
-## 4.4 募资失败风险预警
+## 7.4 风险预警
 {self._extract_failure_warnings(real_cases)}"""
         
         return study
@@ -545,20 +584,20 @@ class FullReportGenerator:
         """生成市场规模估算"""
         product = data.get('product', {})
         
-        sizing = f"""# 10. 市场规模估算（参考）
+        sizing = f"""# 8. 市场规模估算
 
-## 10.1 TAM/SAM/SOM分析
+## 8.1 TAM/SAM/SOM分析
 | 指标 | 定义 | 估算值 | 依据 |
 | --- | --- | --- | --- |
 | TAM | 总可寻址市场 | {data.get('tam', '¥100亿+')} | 全球AI硬件市场规模 |
 | SAM | 可服务市场 | {data.get('sam', '¥10亿')} | 目标地区细分市场 |
 | SOM | 可获得市场 | {data.get('som', '¥1亿')} | 预期市场份额 |
 
-## 10.2 市场增长率
+## 8.2 市场增长率
 - **年增长率**：35%
 - **增长驱动因素**：AI技术普及、消费升级、智能家居趋势
 
-## 10.3 市场规模评分
+## 8.3 市场规模评分
 - **得分**：{data.get('market_size_score', 8)}/10
 - **依据**：{self._get_market_size_reason(data.get('som', ''))}"""
         
@@ -571,7 +610,7 @@ class FullReportGenerator:
         
         model = f"""# 9. 财务模型分析
 
-## 9.1 收入预测（侧重募资收入）
+## 9.1 收入预测
 | 指标 | 数值 | 说明 |
 | --- | --- | --- |
 | 目标募资金额 | {(product.get('target_amount') or '¥500,000')} | 基于首批生产需求 |
@@ -610,20 +649,20 @@ class FullReportGenerator:
         flywheel = self.growth_flywheel['category_flywheels'].get(category, 
             self.growth_flywheel['category_flywheels']['hardware'])
         
-        analysis = f"""# 13. 增长飞轮（参考）
+        analysis = f"""# 10. 增长飞轮分析
 
-## 13.1 增长飞轮设计
+## 10.1 增长飞轮设计
 - **飞轮名称**：{flywheel['name']}
 - **飞轮结构**：{flywheel['cycle']}
 - **关键环节**：{', '.join(flywheel['key_elements'])}
 - **自我强化机制**：每个环节的成功推动下一个环节，形成持续增长循环
 
-## 13.2 增长阶段规划
+## 10.2 增长阶段规划
 | 阶段 | 用户规模 | 目标 | 策略 | 关键指标 |
 | --- | --- | --- | --- | --- |
 {self._format_growth_stages()}
 
-## 13.3 增长瓶颈识别
+## 10.3 增长瓶颈识别
 {self._format_list(flywheel['bottlenecks'], '瓶颈')}"""
         
         return analysis
@@ -634,19 +673,19 @@ class FullReportGenerator:
         north_star = self.metrics_framework['north_star'].get(category,
             self.metrics_framework['north_star']['hardware'])
         
-        framework = f"""# 13b. 数据指标框架（参考）
+        framework = f"""# 11. 数据指标框架
 
-## 13b.1 北极星指标
+## 11.1 北极星指标
 - **指标**：{north_star['metric']}
 - **说明**：{north_star['description']}
 - **目标值**：{data.get('north_star_target', '待设定')}
 
-## 13b.2 AARRR漏斗指标
+## 11.2 AARRR漏斗指标
 | 环节 | 关键指标 | 当前值 | 目标值 |
 | --- | --- | --- | --- |
 {self._format_aarrr_metrics()}
 
-## 13b.3 品类特定指标
+## 11.3 品类特定指标
 {self._format_category_metrics(category)}"""
         
         return framework
@@ -655,19 +694,19 @@ class FullReportGenerator:
         """生成技术架构评估"""
         category = data.get('category', 'hardware')
         
-        assessment = f"""# 13c. 技术架构（参考）
+        assessment = f"""# 12. 技术架构评估
 
-## 13c.1 技术可行性分析
+## 12.1 技术可行性分析
 | 维度 | 评估 | 风险等级 | 应对建议 |
 | --- | --- | --- | --- |
 {self._format_tech_dimensions()}
 
-## 13c.2 技术风险清单
+## 12.2 技术风险清单
 - **高风险**：{', '.join(self.tech_framework['risk_levels']['high'][:3])}
 - **中风险**：{', '.join(self.tech_framework['risk_levels']['medium'][:2])}
 - **低风险**：{', '.join(self.tech_framework['risk_levels']['low'][:2])}
 
-## 13c.3 MVP技术方案
+## 12.3 MVP技术方案
 - **核心功能范围**：{data.get('mvp_features', '语音交互、情感识别、个性化定制')}
 - **技术架构**：{data.get('tech_stack', 'AI模型 + 硬件模块 + 云端服务')}
 - **开发周期**：{data.get('dev_cycle', '3-6个月')}"""
@@ -687,19 +726,19 @@ class FullReportGenerator:
         
         grade_info = self.scoring_model['grade_levels'].get(grade, {})
         
-        scoring_section = f"""# 11. 可行性评分
+        scoring_section = f"""# 19. 可行性评分
 
-## 11.1 评分表
+## 19.1 评分表
 | 维度 | 得分 | 权重 | 加权分 | 说明 |
 | --- | ---: | ---: | ---: | --- |
 {self._format_scoring_table(scoring)}
 
-## 11.2 评分结论
+## 19.2 评分结论
 - **总分**：{score}/100
 - **评级**：{grade} - {grade_info.get('label', '未评级')}
 - **结论**：{grade_info.get('action', '待评估')}
 
-## 11.3 优势与短板
+## 19.3 优势与短板
 - **最大优势**：{', '.join(scoring.get('strengths', ['待补充'])[:3])}
 - **最大短板**：{', '.join(scoring.get('weaknesses', ['待补充'])[:3])}"""
         
@@ -707,18 +746,18 @@ class FullReportGenerator:
     
     def _generate_timeline(self, data: Dict) -> str:
         """生成时间规划"""
-        timeline = f"""# 12. 时间规划
+        timeline = f"""# 20. 时间规划
 
-## 12.1 项目阶段划分
+## 20.1 项目阶段划分
 | 阶段 | 时间 | 目标 | 关键任务 | 成功标准 |
 | --- | --- | --- | --- | --- |
 {self._format_timeline_stages()}
 
-## 12.2 关键路径
-- **最长任务链**：用户调研 → MVP开发 → 内测 → 公测 → 规模化
+## 20.2 关键路径
+- **最长任务链**：用户调研 -> MVP开发 -> 内测 -> 公测 -> 规模化
 - **关键任务**：MVP开发、首批用户获取、商业模式验证
 
-## 12.3 资源规划
+## 20.3 资源规划
 - **人力配置**：{data.get('team_size', '3-5人核心团队')}
 - **预算分配**：{data.get('budget', '研发40%、生产30%、营销20%、运营10%')}"""
         
@@ -843,19 +882,19 @@ class FullReportGenerator:
 
     def _generate_exit_strategy(self, data: Dict) -> str:
         """生成退出策略"""
-        strategy = f"""# 13. 退出策略与止损机制
+        strategy = f"""# 21. 退出策略与止损机制
 
-## 13.1 退出选项评估
+## 21.1 退出选项评估
 | 选项 | 可行性 | 时机 | 预期回报 | 风险 |
 | --- | --- | --- | --- | --- |
 {self._format_exit_options()}
 
-## 13.2 止损触发条件
+## 21.2 止损触发条件
 | 类型 | 指标 | 阈值 | 触发动作 |
 | --- | --- | --- | --- |
 {self._format_stop_loss_conditions()}
 
-## 13.3 风险监控体系
+## 21.3 风险监控体系
 - **监控频率**：每周财务复盘、每月用户指标复盘
 - **预警线**：现金储备<3个月、D7留存<15%、付费转化<1%
 - **责任人**：创始人/CEO"""
@@ -864,9 +903,9 @@ class FullReportGenerator:
     
     def _generate_action_plan(self, data: Dict) -> str:
         """生成行动建议"""
-        plan = f"""# 14. 募资行动建议
+        plan = f"""# 22. 行动建议
 
-## 14.1 上线前7天验证任务
+## 22.1 上线前7天验证任务
 | 任务 | 目的 | 产出 | 完成标准 |
 | --- | --- | --- | --- |
 | 用户访谈（5-10人） | 验证痛点真实性和付费意愿 | 访谈记录 | 80%用户认同痛点 |
@@ -875,7 +914,7 @@ class FullReportGenerator:
 | 成本核算 | 确认成本结构 | 成本清单 | 毛利率>=50% |
 | 目标用户画像 | 明确第一批用户 | 用户画像文档 | 可执行的获客渠道 |
 
-## 14.2 上线前30天推进计划
+## 22.2 上线前30天推进计划
 | 周期 | 重点 | 产出 |
 | --- | --- | --- |
 | 第1周 | 产品定义与原型 | MVP功能清单、产品原型 |
@@ -883,7 +922,7 @@ class FullReportGenerator:
 | 第3周 | 财务与定价 | 财务模型、定价方案 |
 | 第4周 | 推广准备 | 预热计划、募资文案草稿 |
 
-## 14.3 需要补强的关键短板
+## 22.3 需要补强的关键短板
 {self._format_list(data.get('need_improve', ['待补充']), '短板')}"""
         
         return plan
@@ -894,7 +933,7 @@ class FullReportGenerator:
         scoring = data.get('scoring', {})
         score = scoring.get('total_score', 0)
         
-        script = f"""# 15. 沟通话术
+        script = f"""# 23. 沟通话术
 
 ## 给投资人
 我们正在做一款{product.get('name', '')}，帮用户解决{product.get('description', '')[:50]}的问题。目前已完成初步验证，可行性评分{score}/100，计划通过{product.get('platform', '募资平台')}进行募资，目标金额{(product.get('target_amount') or '')}。核心优势是{', '.join(scoring.get('strengths', ['待补充'])[:2])}，需要补强的是{', '.join(scoring.get('weaknesses', ['待补充'])[:2])}。
@@ -1094,7 +1133,7 @@ class FullReportGenerator:
         
         # Build output using list join
         lines = []
-        lines.append("# 2. 募资可行性评分")
+        lines.append("# 13. 募资可行性评分")
         lines.append("")
         lines.append("### 总分: " + str(total) + "/100 -- 评级: " + grade)
         lines.append("")
@@ -1162,9 +1201,9 @@ class FullReportGenerator:
         recommended = crowdfunding.get('recommended', platforms[0][0])
         
         lines = []
-        lines.append("# 3. 平台选择与匹配分析")
+        lines.append("# 14. 平台选择与匹配分析")
         lines.append("")
-        lines.append("## 3.1 平台推荐")
+        lines.append("## 14.1 平台推荐")
         lines.append("根据 " + product_name + " 的品类（" + category + "）和目标市场，推荐平台：")
         lines.append("")
         lines.append("| 平台 | 推荐指数 | 适用理由 | 平台费率 | 平均募集 |")
@@ -1175,7 +1214,7 @@ class FullReportGenerator:
         lines.append("")
         lines.append("**推荐平台：" + recommended + "**")
         lines.append("")
-        lines.append("## 3.2 平台审核通过率预估")
+        lines.append("## 14.2 平台审核通过率预估")
         lines.append("| 平台 | 预估通过率 | 主要审核点 |")
         lines.append("| --- | --- | --- |")
         lines.append("| " + recommended + " | 70-85% | 产品创新性、团队能力、项目完整性 |")
@@ -1197,9 +1236,9 @@ class FullReportGenerator:
         premium = int(cost * 2.5)
         
         lines = []
-        lines.append("# 5. 募资定价策略")
+        lines.append("# 15. 募资定价策略")
         lines.append("")
-        lines.append("## 5.1 三档定价方案")
+        lines.append("## 15.1 三档定价方案")
         lines.append("基于成本 ¥" + str(int(cost)) + "，建议三档定价：")
         lines.append("")
         lines.append("| 档位 | 价格 | 数量限制 | 内容 | 预期转化 |")
@@ -1208,12 +1247,12 @@ class FullReportGenerator:
         lines.append("| 标准档 | ¥" + str(standard) + " | 500名 | 标准版+配件 | 45% |")
         lines.append("| 豪华档 | ¥" + str(premium) + " | 50名 | 全套+定制+优先发货 | 15% |")
         lines.append("")
-        lines.append("## 5.2 定价策略说明")
+        lines.append("## 15.2 定价策略说明")
         lines.append("- **早鸟档**：以接近成本的价格吸引首批支持者，快速达成首日目标")
         lines.append("- **标准档**：主力销售档位，兼顾利润和转化率")
         lines.append("- **豪华档**：高净值用户贡献额外收入，提供差异化价值")
         lines.append("")
-        lines.append("## 5.3 定价合理性评估")
+        lines.append("## 15.3 定价合理性评估")
         lines.append("- 早鸟价毛利率：" + str(round((early_bird - cost) / early_bird * 100)) + "%")
         lines.append("- 标准价毛利率：" + str(round((standard - cost) / standard * 100)) + "%")
         lines.append("- 豪华价毛利率：" + str(round((premium - cost) / premium * 100)) + "%")
@@ -1223,9 +1262,9 @@ class FullReportGenerator:
     def _generate_crowdfunding_promotion(self, data: Dict) -> str:
         """生成推广策略与时间线"""
         lines = []
-        lines.append("# 6. 推广策略与时间线")
+        lines.append("# 16. 推广策略与时间线")
         lines.append("")
-        lines.append("## 6.1 四阶段推广计划")
+        lines.append("## 16.1 四阶段推广计划")
         lines.append("| 阶段 | 时间 | 核心动作 | 目标 |")
         lines.append("|---|---|---|---|")
         lines.append("| 预热期 | 上线前30天 | 社群运营、邮件列表、KOL种草 | 积結500+潜在backer |")
@@ -1233,14 +1272,14 @@ class FullReportGenerator:
         lines.append("| 持续期 | Day 2-25 | 每日更新、回复留言、KOL评测 | 达标75% |")
         lines.append("| 收尾冲刺 | Day 26-30 | 追加福利、限时加价、社交分享 | 达标100%+ |")
         lines.append("")
-        lines.append("## 6.2 预热期关键动作")
+        lines.append("## 16.2 预热期关键动作")
         lines.append("1. 建立项目社交媒体账号（Facebook/Instagram/微博）")
         lines.append("2. 制作并发布产品预告视频（30秒-1分钟）")
         lines.append("3. 联系3-5个相关领域KOL进行种草")
         lines.append("4. 建立邮件列表，每周发送项目进展")
         lines.append("5. 加入相关社群，自然融入并建立信任")
         lines.append("")
-        lines.append("## 6.3 首日冲刺策略")
+        lines.append("## 16.3 首日冲刺策略")
         lines.append("- 准备亲友支持名单，确保首小时20+支持")
         lines.append("- 设置早鸟档限时限量的紧迫感")
         lines.append("- 同步在所有社交媒体发布上线消息")
@@ -1251,9 +1290,9 @@ class FullReportGenerator:
     def _generate_crowdfunding_checklist(self, data: Dict) -> str:
         """生成平台审核准备清单"""
         lines = []
-        lines.append("# 7. 平台审核准备清单")
+        lines.append("# 17. 平台审核准备清单")
         lines.append("")
-        lines.append("## 7.1 必备材料")
+        lines.append("## 17.1 必备材料")
         lines.append("- [ ] 产品名称和一句话介绍（50字内）")
         lines.append("- [ ] 项目故事/团队介绍（800字以上）")
         lines.append("- [ ] 产品原型/Demo/渲染图（至少5张）")
@@ -1264,18 +1303,78 @@ class FullReportGenerator:
         lines.append("- [ ] 供应链/生产计划（硬件类必填）")
         lines.append("- [ ] 预计交付时间和物流方案")
         lines.append("")
-        lines.append("## 7.2 加分材料")
+        lines.append("## 17.2 加分材料")
         lines.append("- [ ] 用户调研/访谈记录")
         lines.append("- [ ] 专利或技术认证文件")
         lines.append("- [ ] 媒体报道或行业背书")
         lines.append("- [ ] 合作伙伴意向书")
         lines.append("")
-        lines.append("## 7.3 审核常见驳回原因")
+        lines.append("## 17.3 审核常见驳回原因")
         lines.append("1. 项目描述过于模糊，无法理解产品价值")
         lines.append("2. 缺少实物原型或演示视频")
         lines.append("3. 回报档位设计不合理")
         lines.append("4. 团队背景与项目不匹配")
         lines.append("5. 交付计划不切实际")
+        
+        return '\n'.join(lines)
+
+    def _generate_crowdfunding_case_performance(self, data: Dict) -> str:
+        """生成竞品案例与募资表现（第18章）"""
+        real_cases = data.get('competitor_analysis', {}).get('real_cases', [])
+        all_real_cases = data.get('competitor_analysis', {}).get('all_real_cases', [])
+        
+        lines = []
+        lines.append("# 18. 竞品案例与募资表现")
+        lines.append("")
+        lines.append("## 18.1 募资成功案例分析")
+        lines.append("| 案例名称 | 平台 | 品类 | 募集金额 | 支持者数 | 达成率 | 关键成功因素 |")
+        lines.append("| --- | --- | --- | --- | --- | --- | --- |")
+        
+        cases_to_show = real_cases[:10] if real_cases else all_real_cases[:10]
+        for case in cases_to_show:
+            lines.append("| " + str(case.get('name', '')) + " | " + str(case.get('platform', '')) + " | " + str(case.get('category', '')) + " | " + str(case.get('amount_raised', '')) + " | " + str(case.get('backers', '')) + " | " + str(case.get('success_rate', '')) + " | " + str(case.get('success_factors', '待补充')) + " |")
+        
+        lines.append("")
+        lines.append("## 18.2 募资表现数据统计")
+        
+        if cases_to_show:
+            amounts = []
+            for c in cases_to_show:
+                amt = c.get('amount_raised', '')
+                if isinstance(amt, (int, float)):
+                    amounts.append(amt)
+            
+            if amounts:
+                avg_amt = sum(amounts) / len(amounts)
+                max_amt = max(amounts)
+                min_amt = min(amounts)
+                lines.append("- **平均募集金额**：约" + f"{avg_amt:,.0f}" + "（基于" + str(len(amounts)) + "个案例）")
+                lines.append("- **最高募集**：" + f"{max_amt:,.0f}")
+                lines.append("- **最低募集**：" + f"{min_amt:,.0f}")
+            else:
+                lines.append("- 数据不足，无法统计")
+        else:
+            lines.append("- 暂无相关案例数据")
+        
+        lines.append("")
+        lines.append("## 18.3 募资表现对本项目的启示")
+        
+        if cases_to_show:
+            lines.append("- **定价区间参考**：根据同类案例，建议定价在本品类中位数附近")
+            lines.append("- **目标金额建议**：参考同品类成功案例的平均募集金额设定合理目标")
+            lines.append("- **推广重点**：成功案例普遍重视预热期社群运营和首日冲刺")
+            lines.append("- **回报档位设计**：早鸟档+标准档+豪华档的三档结构效果最佳")
+        else:
+            lines.append("- 待补充更多案例后分析")
+        
+        lines.append("")
+        lines.append("## 18.4 本项目募资预估")
+        financials = data.get('financial_analysis', {})
+        backers = financials.get('backers_needed', {}).get('total_backers', 'XX')
+        revenue = financials.get('revenue', {}).get('actual_revenue_cny', 'XX')
+        lines.append("- **预计支持者数量**：" + str(backers) + "人")
+        lines.append("- **预计实际到手收入**：¥" + str(revenue))
+        lines.append("- **建议目标金额**：参考同品类成功案例，设定有挑战但可达成的目标")
         
         return '\n'.join(lines)
 
@@ -1726,21 +1825,28 @@ class FullHTMLReportGenerator:
         nav_items = [
             ('section0', '0. 执行摘要'),
             ('section1', '1. 项目画像识别'),
-            ('section2', '2. 募资可行性评分'),
-            ('section3', '3. 平台选择与匹配'),
-            ('section4', '4. 竞品案例与募资表现'),
-            ('section5', '5. 募资定价策略'),
-            ('section6', '6. 推广策略与时间线'),
-            ('section7', '7. 平台审核准备清单'),
-            ('section8', '8. SWOT分析'),
+            ('section2', '2. 市场分析'),
+            ('section3', '3. PEST分析'),
+            ('section4', '4. 波特五力分析'),
+            ('section5', '5. SWOT分析'),
+            ('section6', '6. 商业模式画布'),
+            ('section7', '7. 竞品案例研究'),
+            ('section8', '8. 市场规模估算'),
             ('section9', '9. 财务模型分析'),
-            ('section10', '10. 市场规模估算'),
-            ('section11', '11. 市场分析+PEST'),
-            ('section12', '12. 商业模式+波特五力'),
-            ('section13', '13. 增长飞轮+技术架构'),
-            ('section14', '附录'),
-            ('section15', '14. 募资行动建议'),
-            ('section16', '15. 沟通话术'),
+            ('section10', '10. 增长飞轮分析'),
+            ('section11', '11. 数据指标框架'),
+            ('section12', '12. 技术架构评估'),
+            ('section13', '13. 募资可行性评分'),
+            ('section14', '14. 平台选择与匹配'),
+            ('section15', '15. 募资定价策略'),
+            ('section16', '16. 推广策略与时间线'),
+            ('section17', '17. 平台审核准备清单'),
+            ('section18', '18. 竞品募资表现'),
+            ('section19', '19. 可行性评分'),
+            ('section20', '20. 时间规划'),
+            ('section21', '21. 退出策略'),
+            ('section22', '22. 行动建议'),
+            ('section23', '23. 沟通话术'),
         ]
 
         nav_items_html = ''.join([
@@ -1948,23 +2054,23 @@ class FullHTMLReportGenerator:
         <div class="max-w-5xl mx-auto space-y-8">
             {self._section_executive_summary(analysis_data)}
             {self._section_project_profile(analysis_data)}
-            {self._section_crowdfunding_scoring(analysis_data)}
-            {self._section_crowdfunding_platform(analysis_data)}
-            {self._section_competitors(analysis_data)}
-            {self._section_crowdfunding_pricing(analysis_data)}
-            {self._section_crowdfunding_promotion(analysis_data)}
-            {self._section_crowdfunding_checklist(analysis_data)}
-            {self._section_swot(analysis_data)}
-            {self._section_financial(analysis_data)}
-            {self._section_market_sizing(analysis_data)}
             {self._section_market_analysis(analysis_data)}
             {self._section_pest(analysis_data)}
             {self._section_porter_forces(analysis_data)}
+            {self._section_swot(analysis_data)}
             {self._section_business_model(analysis_data)}
+            {self._section_competitors(analysis_data)}
+            {self._section_market_sizing(analysis_data)}
+            {self._section_financial(analysis_data)}
             {self._section_growth_flywheel(analysis_data)}
             {self._section_tech(analysis_data)}
-            {self._section_scoring(analysis_data)}
+            {self._section_crowdfunding_scoring(analysis_data)}
+            {self._section_crowdfunding_platform(analysis_data)}
+            {self._section_crowdfunding_pricing(analysis_data)}
+            {self._section_crowdfunding_promotion(analysis_data)}
+            {self._section_crowdfunding_checklist(analysis_data)}
             {self._section_appendix(analysis_data)}
+            {self._section_scoring(analysis_data)}
             {self._section_action_plan(analysis_data)}
             {self._section_communication(analysis_data)}
         </div>
@@ -2173,8 +2279,8 @@ class FullHTMLReportGenerator:
         for n, s in risks:
             factors_html += '<div class="flex items-center gap-2 text-red-300"><span class="tag tag-poor">' + str(s) + '分</span><span class="text-sm">' + self._esc(n) + '</span></div>'
 
-        html = '<div id="section2" class="glass-card p-8 fade-in">'
-        html += '<h2 class="section-header text-2xl font-bold text-white mb-6">二、募资可行性评分</h2>'
+        html = '<div id="section13" class="glass-card p-8 fade-in">'
+        html += '<h2 class="section-header text-2xl font-bold text-white mb-6">十三、募资可行性评分</h2>'
         html += '<div class="flex items-center gap-6 mb-8">'
         html += '<div class="flex items-center justify-center relative">'
         html += '<svg width="120" height="120" viewBox="0 0 120 120"><defs><linearGradient id="cfScoreGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#60a5fa"/><stop offset="100%" stop-color="#a78bfa"/></linearGradient></defs>'
@@ -2204,8 +2310,8 @@ class FullHTMLReportGenerator:
     def _section_crowdfunding_platform(self, data: Dict) -> str:
         """平台选择与匹配 HTML - reuse crowdfunding section"""
         result = self._section_crowdfunding(data)
-        result = result.replace('id="section12b"', 'id="section3"')
-        result = result.replace('募资平台专项分析', '三、平台选择与匹配分析')
+        result = result.replace('id="section12b"', 'id="section14"')
+        result = result.replace('募资平台专项分析', '十四、平台选择与匹配分析')
         return result
 
     def _section_crowdfunding_pricing(self, data: Dict) -> str:
@@ -2220,8 +2326,8 @@ class FullHTMLReportGenerator:
         standard = int(cost * 1.7)
         premium = int(cost * 2.5)
 
-        html = '<div id="section5" class="glass-card p-8 fade-in">'
-        html += '<h2 class="section-header text-2xl font-bold text-white mb-6">五、募资定价策略</h2>'
+        html = '<div id="section15" class="glass-card p-8 fade-in">'
+        html += '<h2 class="section-header text-2xl font-bold text-white mb-6">十五、募资定价策略</h2>'
         html += '<div class="overflow-x-auto"><table class="w-full"><thead><tr class="text-left text-sm text-gray-400">'
         html += '<th class="pb-3 font-medium">档位</th><th class="pb-3 font-medium">价格</th><th class="pb-3 font-medium">数量限制</th><th class="pb-3 font-medium">内容</th><th class="pb-3 font-medium">预期转化</th>'
         html += '</tr></thead><tbody>'
@@ -2238,8 +2344,8 @@ class FullHTMLReportGenerator:
 
     def _section_crowdfunding_promotion(self, data: Dict) -> str:
         """推广策略与时间线 HTML"""
-        html = '<div id="section6" class="glass-card p-8 fade-in">'
-        html += '<h2 class="section-header text-2xl font-bold text-white mb-6">六、推广策略与时间线</h2>'
+        html = '<div id="section16" class="glass-card p-8 fade-in">'
+        html += '<h2 class="section-header text-2xl font-bold text-white mb-6">十六、推广策略与时间线</h2>'
         html += '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">'
         stages = [
             ('预热期', '上线前30天', '社群运营、邮件列表、KOL种草', '积累500+潜在backer', 'from-blue-500/20 to-blue-600/10', 'border-blue-500/30', '#3b82f6'),
@@ -2260,30 +2366,37 @@ class FullHTMLReportGenerator:
     def _section_crowdfunding_checklist(self, data: Dict) -> str:
         """平台审核准备清单 HTML"""
         items = ['产品名称和一句话介绍（50字内）', '项目故事/团队介绍（800字以上）', '产品原型/Demo/渲染图（至少5张）', '募资视频（1-3分钟）', '回报档位设计（至少3档）', '风险说明和退换政策', '团队背景和执行能力证明', '供应链/生产计划（硬件类必填）', '预计交付时间和物流方案']
-        html = '<div id="section7" class="glass-card p-8 fade-in">'
-        html += '<h2 class="section-header text-2xl font-bold text-white mb-6">七、平台审核准备清单</h2>'
+        html = '<div id="section17" class="glass-card p-8 fade-in">'
+        html += '<h2 class="section-header text-2xl font-bold text-white mb-6">十七、平台审核准备清单</h2>'
         for item in items:
             html += '<div class="flex items-center gap-3 py-2 border-b border-white/5 last:border-0"><div class="w-5 h-5 rounded border border-gray-500 flex items-center justify-center flex-shrink-0"></div><span class="text-sm text-gray-300">' + self._esc(item) + '</span></div>'
         html += '</div>'
         return html
 
     def _section_appendix(self, data: Dict) -> str:
-        """附录 HTML"""
-        scoring = data.get('scoring', {})
-        score = scoring.get('total_score', 0)
-        html = '<div id="section14" class="glass-card p-8 fade-in">'
-        html += '<h2 class="section-header text-2xl font-bold text-white mb-6">附录</h2>'
-        html += '<div class="glass-card rounded-xl p-6 mb-6" style="background: rgba(30, 30, 46, 0.5);">'
-        html += '<h3 class="text-lg font-semibold text-white mb-4">附录A：产品通用可行性评分</h3>'
-        html += '<div class="flex items-center gap-4 mb-4"><span class="text-3xl font-bold gradient-text">' + str(score) + '/100</span><span class="text-gray-400">（10维度加权评分，仅供参考）</span></div>'
-        html += '</div>'
-        html += '<div class="glass-card rounded-xl p-6 mb-6" style="background: rgba(30, 30, 46, 0.5);">'
-        html += '<h3 class="text-lg font-semibold text-white mb-4">附录B：时间规划</h3>'
-        html += '<p class="text-sm text-gray-400">验证期(0-3月) -> 开发期(3-6月) -> 内测期(6-9月) -> 公测期(9-12月) -> 规模化期(12月+)</p></div>'
-        html += '<div class="glass-card rounded-xl p-6" style="background: rgba(30, 30, 46, 0.5);">'
-        html += '<h3 class="text-lg font-semibold text-white mb-4">附录C：退出策略与止损机制</h3>'
-        html += '<p class="text-sm text-gray-400">退出选项：被收购 / IPO / 股权转让 / 停业清算</p>'
-        html += '<p class="text-sm text-gray-400 mt-2">止损线：现金储备&lt;3月运营成本、D7留存&lt;15%、付费转化&lt;1%</p></div></div>'
+        """竞品募资表现 HTML (section18)"""
+        real_cases = data.get('competitor_analysis', {}).get('real_cases', [])
+        all_real_cases = data.get('competitor_analysis', {}).get('all_real_cases', [])
+        cases_to_show = real_cases[:8] if real_cases else all_real_cases[:8]
+        
+        html = '<div id="section18" class="glass-card p-8 fade-in">'
+        html += '<h2 class="section-header text-2xl font-bold text-white mb-6">十八、竞品案例与募资表现</h2>'
+        html += '<div class="mt-4 overflow-x-auto"><table class="w-full">'
+        html += '<thead><tr class="text-left text-sm text-gray-400"><th class="pb-3 font-medium">案例名称</th><th class="pb-3 font-medium">平台</th><th class="pb-3 font-medium">品类</th><th class="pb-3 font-medium">募集金额</th><th class="pb-3 font-medium">支持者</th><th class="pb-3 font-medium">达成率</th></tr></thead>'
+        html += '<tbody>'
+        for c in cases_to_show:
+            html += f'<tr><td class="table-cell py-3">{self._esc(c.get("name",""))}</td><td class="table-cell py-3">{self._esc(c.get("platform",""))}</td><td class="table-cell py-3">{self._esc(c.get("category",""))}</td><td class="table-cell py-3">{self._esc(str(c.get("amount_raised","")))}</td><td class="table-cell py-3">{self._esc(str(c.get("backers","")))}</td><td class="table-cell py-3">{self._esc(str(c.get("success_rate","")))}</td></tr>'
+        if not cases_to_show:
+            html += '<tr><td class="table-cell py-3 text-gray-500" colspan="6">暂无数据</td></tr>'
+        html += '</tbody></table></div>'
+        
+        financials = data.get('financial_analysis', {})
+        backers = financials.get('backers_needed', {}).get('total_backers', 'XX')
+        revenue = financials.get('revenue', {}).get('actual_revenue_cny', 'XX')
+        html += '<div class="mt-6 grid grid-cols-2 gap-4">'
+        html += '<div class="bg-blue-500/10 rounded-xl p-4 border border-blue-500/20"><h4 class="font-medium text-blue-300 mb-2">本项目募资预估</h4><p class="text-sm text-gray-400">预计支持者：' + str(backers) + '人</p><p class="text-sm text-gray-400">预计到手收入：¥' + str(revenue) + '</p></div>'
+        html += '<div class="bg-purple-500/10 rounded-xl p-4 border border-purple-500/20"><h4 class="font-medium text-purple-300 mb-2">募资建议</h4><p class="text-sm text-gray-400">参考同品类成功案例设定合理目标</p><p class="text-sm text-gray-400">重视预热期社群运营和首日冲刺</p></div>'
+        html += '</div></div>'
         return html
 
     def _section_project_profile(self, data: Dict) -> str:
@@ -2356,8 +2469,8 @@ class FullHTMLReportGenerator:
 
     def _section_market_analysis(self, data: Dict) -> str:
         market_data = self.market_data.get('ai_hardware', {})
-        return f'''<div id="section11" class="glass-card p-8 fade-in">
-    <h2 class="section-header text-2xl font-bold text-white mb-6">十一、市场分析+PEST</h2>
+        return f'''<div id="section2" class="glass-card p-8 fade-in">
+    <h2 class="section-header text-2xl font-bold text-white mb-6">二、市场分析</h2>
     <div class="grid grid-cols-2 gap-6">
         <div class="canvas-section">
             <h3 class="text-sm text-gray-400 mb-2">AI硬件市场规模趋势</h3>
@@ -2412,8 +2525,8 @@ class FullHTMLReportGenerator:
         def pest_list(items):
             return ''.join([f'<li>• {self._esc(item)}</li>' for item in items if item])
 
-        return f'''<div id="section11a" class="glass-card p-8 fade-in">
-    <h2 class="section-header text-2xl font-bold text-white mb-6">PEST分析</h2>
+        return f'''<div id="section3" class="glass-card p-8 fade-in">
+    <h2 class="section-header text-2xl font-bold text-white mb-6">三、PEST分析</h2>
     <div class="grid grid-cols-2 gap-6">
         <div class="pest-item pest-political">
             <div class="flex items-center gap-2 mb-2">
@@ -2464,8 +2577,8 @@ class FullHTMLReportGenerator:
     <div class="force-bar"><div class="force-fill {f.get('color', 'bg-blue-500')}" style="width: {f.get('width', 50)}%"></div></div>
     <p class="text-xs text-gray-500 mt-2">{self._esc(f.get('desc', ''))}</p>
 </div>'''
-        return f'''<div id="section12a" class="glass-card p-8 fade-in">
-    <h2 class="section-header text-2xl font-bold text-white mb-6">波特五力分析</h2>
+        return f'''<div id="section4" class="glass-card p-8 fade-in">
+    <h2 class="section-header text-2xl font-bold text-white mb-6">四、波特五力分析</h2>
     <div class="space-y-4">{forces_html}</div>
     <div class="mt-6 bg-white/5 rounded-xl p-4">
         <h4 class="font-medium text-white mb-2">竞争战略建议</h4>
@@ -2487,8 +2600,8 @@ class FullHTMLReportGenerator:
         def swot_list(items, icon, color):
             return ''.join([f'<li class="flex items-start gap-2"><span class="{color} mt-0.5">{icon}</span><span class="text-sm text-gray-300">{self._esc(item)}</span></li>' for item in items if item])
 
-        return f'''<div id="section8" class="glass-card p-8 fade-in">
-    <h2 class="section-header text-2xl font-bold text-white mb-6">八、SWOT分析（募资视角）</h2>
+        return f'''<div id="section5" class="glass-card p-8 fade-in">
+    <h2 class="section-header text-2xl font-bold text-white mb-6">五、SWOT分析</h2>
     <div class="grid grid-cols-2 gap-4">
         <div class="swot-cell swot-strength">
             <div class="flex items-center gap-2 mb-3">
@@ -2538,8 +2651,8 @@ class FullHTMLReportGenerator:
     <div class="text-blue-400 font-bold mb-2">{self._esc(label)}</div>
     <div class="text-sm text-gray-400">{self._esc(value)}</div>
 </div>''' for label, value in fields])
-        return f'''<div id="section12" class="glass-card p-8 fade-in">
-    <h2 class="section-header text-2xl font-bold text-white mb-6">十二、商业模式画布</h2>
+        return f'''<div id="section6" class="glass-card p-8 fade-in">
+    <h2 class="section-header text-2xl font-bold text-white mb-6">六、商业模式画布</h2>
     <div class="grid grid-cols-3 gap-4">{boxes}</div>
 </div>'''
 
@@ -2579,8 +2692,8 @@ class FullHTMLReportGenerator:
         else:
             case_cards = '<div class="col-span-2 text-gray-400">暂无相似成功案例</div>'
 
-        return f'''<div id="section4" class="glass-card p-8 fade-in">
-    <h2 class="section-header text-2xl font-bold text-white mb-6">四、竞品案例与募资表现</h2>
+        return f'''<div id="section7" class="glass-card p-8 fade-in">
+    <h2 class="section-header text-2xl font-bold text-white mb-6">七、竞品案例研究</h2>
     <h3 class="text-lg font-semibold text-gray-200 mb-3">直接竞品</h3>
     <div class="overflow-x-auto">
         <table class="w-full">
@@ -2605,8 +2718,8 @@ class FullHTMLReportGenerator:
         tam_num = self._extract_number(tam) or 8000
         sam_num = self._extract_number(sam) or 2000
         som_num = self._extract_number(som) or 50
-        return f'''<div id="section10" class="glass-card p-8 fade-in">
-    <h2 class="section-header text-2xl font-bold text-white mb-6">十、市场规模估算（参考）</h2>
+        return f'''<div id="section8" class="glass-card p-8 fade-in">
+    <h2 class="section-header text-2xl font-bold text-white mb-6">八、市场规模估算</h2>
     <div class="grid grid-cols-3 gap-4 mb-6">
         <div class="bg-gradient-to-br from-blue-500/20 to-blue-600/10 rounded-xl p-6 border border-blue-500/20">
             <div class="text-xs text-gray-400 mb-1">TAM</div>
@@ -2666,7 +2779,7 @@ class FullHTMLReportGenerator:
         </tr>''' for label, val, pct in cost_items])
 
         return f'''<div id="section9" class="glass-card p-8 fade-in">
-    <h2 class="section-header text-2xl font-bold text-white mb-6">九、财务模型分析（募资视角）</h2>
+    <h2 class="section-header text-2xl font-bold text-white mb-6">九、财务模型分析</h2>
     <div class="grid grid-cols-2 gap-6">
         <div>
             <h3 class="text-lg font-semibold text-gray-200 mb-3">收入预测</h3>
@@ -2733,8 +2846,8 @@ class FullHTMLReportGenerator:
     <div class="text-xs text-gray-500 mt-2">策略：{self._esc(s['strategy'])}</div>
 </div>'''
         bottlenecks_html = ''.join([f'<li class="text-sm text-gray-400">• {self._esc(b)}</li>' for b in flywheel['bottlenecks']])
-        return f'''<div id="section13a" class="glass-card p-8 fade-in">
-    <h2 class="section-header text-2xl font-bold text-white mb-6">十三、增长飞轮+技术架构</h2>
+        return f'''<div id="section10" class="glass-card p-8 fade-in">
+    <h2 class="section-header text-2xl font-bold text-white mb-6">十、增长飞轮分析</h2>
     <div class="relative bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl p-8 border border-blue-500/20 mb-6">
         <h3 class="text-lg font-semibold text-white mb-6 text-center">{self._esc(flywheel['name'])}</h3>
         <div class="flex justify-center">
@@ -2801,8 +2914,8 @@ class FullHTMLReportGenerator:
     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
     <span class="text-sm">{self._esc(r)}</span>
 </div>'''
-        return f'''<div id="section13b" class="glass-card p-8 fade-in">
-    <h2 class="section-header text-2xl font-bold text-white mb-6">技术架构评估</h2>
+        return f'''<div id="section11" class="glass-card p-8 fade-in">
+    <h2 class="section-header text-2xl font-bold text-white mb-6">十一、技术架构评估</h2>
     <div class="grid grid-cols-2 gap-6">
         <div>
             <h3 class="text-lg font-semibold text-gray-200 mb-3">技术可行性</h3>
@@ -2854,8 +2967,8 @@ class FullHTMLReportGenerator:
         strengths = scoring.get('strengths', ['待补充'])
         weaknesses = scoring.get('weaknesses', ['待补充'])
 
-        return f'''<div id="section13c" class="glass-card p-8 fade-in">
-    <h2 class="section-header text-2xl font-bold text-white mb-6">附录：通用可行性评分</h2>
+        return f'''<div id="section19" class="glass-card p-8 fade-in">
+    <h2 class="section-header text-2xl font-bold text-white mb-6">十九、可行性评分（10维度加权评分）</h2>
     <div class="canvas-section">
         <h3 class="text-sm text-gray-400 mb-2">各维度评分雷达图</h3>
         <canvas id="scoringRadarChart"></canvas>
@@ -3135,8 +3248,8 @@ class FullHTMLReportGenerator:
     <span class="text-sm text-gray-400">{self._esc(item)}</span>
 </li>''' for item in plan30])
 
-        return f'''<div id="section15" class="glass-card p-8 fade-in">
-    <h2 class="section-header text-2xl font-bold text-white mb-6">十四、募资行动建议</h2>
+        return f'''<div id="section22" class="glass-card p-8 fade-in">
+    <h2 class="section-header text-2xl font-bold text-white mb-6">二十二、行动建议</h2>
     <div class="grid grid-cols-2 gap-6">
         <div>
             <h3 class="text-lg font-semibold text-gray-200 mb-3">7天验证任务</h3>
@@ -3173,8 +3286,8 @@ class FullHTMLReportGenerator:
 
         platform_pitch = f"""本项目属于{category}品类，已有产品原型，团队具备相关经验。目标用户明确，痛点真实存在，商业模式清晰。预计募集{amount}，用于首批生产和市场推广。"""
 
-        return f'''<div id="section16" class="glass-card p-8 fade-in">
-    <h2 class="section-header text-2xl font-bold text-white mb-6">十五、沟通话术</h2>
+        return f'''<div id="section23" class="glass-card p-8 fade-in">
+    <h2 class="section-header text-2xl font-bold text-white mb-6">二十三、沟通话术</h2>
     <div class="space-y-6">
         <div class="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-xl p-6 border border-purple-500/20">
             <h3 class="text-lg font-semibold text-white mb-4">投资人汇报话术</h3>

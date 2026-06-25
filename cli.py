@@ -23,7 +23,8 @@ from feasibility_agent import FeasibilityAgent
 
 def print_banner():
     print("=" * 60)
-    print("产品可行性分析 Agent v2.0")
+    print("产品可行性分析 Agent v3.0")
+    print("募资平台可行性分析工具")
     print("=" * 60)
     print()
 
@@ -36,9 +37,45 @@ def analyze_from_text(text: str, llm_provider: str = "auto") -> dict:
 
 
 def analyze_from_file(filepath: str, llm_provider: str = "auto") -> dict:
-    """从文件运行分析"""
-    with open(filepath, 'r', encoding='utf-8') as f:
-        text = f.read()
+    """从文件运行分析（支持 txt、pdf）"""
+    path = Path(filepath)
+    ext = path.suffix.lower()
+
+    if ext == '.pdf':
+        # PDF文件：用pdfplumber提取文字
+        try:
+            import pdfplumber
+        except ImportError:
+            print("错误：读取PDF需要安装 pdfplumber，请运行：pip install pdfplumber")
+            sys.exit(1)
+        text_parts = []
+        try:
+            with pdfplumber.open(filepath) as pdf:
+                for page in pdf.pages:
+                    page_text = page.extract_text()
+                    if page_text:
+                        text_parts.append(page_text)
+        except Exception as e:
+            print(f"错误：无法读取PDF文件: {e}")
+            sys.exit(1)
+        text = '\n\n'.join(text_parts)
+        if not text.strip():
+            print("错误：PDF中没有提取到文字内容")
+            sys.exit(1)
+        print(f"已从PDF提取 {len(text)} 字符")
+    elif ext in ('.txt', '.md', '.text'):
+        with open(filepath, 'r', encoding='utf-8') as f:
+            text = f.read()
+    else:
+        # 尝试作为文本文件读取
+        try:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                text = f.read()
+        except UnicodeDecodeError:
+            print(f"错误：无法读取文件 {filepath}（不支持的格式）")
+            print("支持格式：.txt .md .pdf")
+            sys.exit(1)
+
     return analyze_from_text(text, llm_provider)
 
 
@@ -100,6 +137,8 @@ def print_results(report: dict):
         print(f"   Markdown: {saved['markdown_report']}")
     if saved.get('html_report'):
         print(f"   HTML: {saved['html_report']}")
+    if saved.get('pdf_report'):
+        print(f"   PDF: {saved['pdf_report']}")
 
     print("\n" + "=" * 60)
 
