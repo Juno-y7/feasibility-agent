@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+
+# 虚拟环境
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 报告输出（用户生成的，不入库）
+reports/
+
+# 数据文件（动态更新，不入库）
+tools/data/competitors.json
+tools/case-db/real_crowdfunding_cases.json
+tools/iteration_history.json
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 临时文件
+*.tmp
+*.log

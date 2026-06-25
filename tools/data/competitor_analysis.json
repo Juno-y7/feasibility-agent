@@ -1,0 +1,235 @@
+{
+  "total_competitors": 10,
+  "analysis_date": "2026-06-24",
+  "category_analysis": {
+    "AI硬件": {
+      "category": "AI硬件",
+      "total_projects": 3,
+      "projects": [
+        {
+          "id": 1,
+          "name": "AI智能音箱 Pro",
+          "amount_raised": "¥1,200,000",
+          "backers": "2,856",
+          "success_rate": "240%",
+          "status": "已成功",
+          "url": "https://www.zeczec.com/projects/ai-speaker-pro"
+        },
+        {
+          "id": 2,
+          "name": "AI绘画板 Master",
+          "amount_raised": "¥850,000",
+          "backers": "1,623",
+          "success_rate": "283%",
+          "status": "已成功",
+          "url": "https://www.zeczec.com/projects/ai-drawing-board"
+        },
+        {
+          "id": 8,
+          "name": "AI语音助手 Cube",
+          "amount_raised": "¥560,000",
+          "backers": "2,156",
+          "success_rate": "280%",
+          "status": "已成功",
+          "url": "https://www.zeczec.com/projects/ai-voice-cube"
+        }
+      ],
+      "amount_stats": {
+        "avg_amount": 870000.0,
+        "max_amount": 1200000.0,
+        "min_amount": 560000.0,
+        "total_amount": 2610000.0
+      },
+      "backers_stats": {
+        "avg_backers": 2211.67,
+        "max_backers": 2856.0,
+        "min_backers": 1623.0,
+        "total_backers": 6635.0
+      },
+      "success_rate_stats": {
+        "avg_success_rate": 267.67,
+        "max_success_rate": 283.0,
+        "min_success_rate": 240.0
+      }
+    },
+    "智能穿戴": {
+      "category": "智能穿戴",
+      "total_projects": 2,
+      "projects": [
+        {
+          "id": 3,
+          "name": "AI翻译耳机 Air",
+          "amount_raised": "¥2,100,000",
+          "backers": "4,321",
+          "success_rate": "262%",
+          "status": "已成功",
+          "url": "https://www.zeczec.com/projects/ai-translate-earbuds"
+        },
+        {
+          "id": 9,
+          "name": "AI运动手表 Fit",
+          "amount_raised": "¥1,800,000",
+          "backers": "3,678",
+          "success_rate": "300%",
+          "status": "已成功",
+          "url": "https://www.zeczec.com/projects/ai-fit-watch"
+        }
+      ],
+      "amount_stats": {
+        "avg_amount": 1950000.0,
+        "max_amount": 2100000.0,
+        "min_amount": 1800000.0,
+        "total_amount": 3900000.0
+      },
+      "backers_stats": {
+        "avg_backers": 3999.5,
+        "max_backers": 4321.0,
+        "min_backers": 3678.0,
+        "total_backers": 7999.0
+      },
+      "success_rate_stats": {
+        "avg_success_rate": 281.0,
+        "max_success_rate": 300.0,
+        "min_success_rate": 262.0
+      }
+    },
+    "智能家居": {
+      "category": "智能家居",
+      "total_projects": 2,
+      "projects": [
+        {
+          "id": 4,
+          "name": "AI智能摄像头 Home",
+          "amount_raised": "¥680,000",
+          "backers": "1,890",
+          "success_rate": "340%",
+          "status": "已成功",
+          "url": "https://www.zeczec.com/projects/ai-camera-home"
+        },
+        {
+          "id": 7,
+          "name": "AI智能台灯",
+          "amount_raised": "¥350,000",
+          "backers": "1,234",
+          "success_rate": "350%",
+          "status": "已成功",
+          "url": "https://www.zeczec.com/projects/ai-lamp"
+        }
+      ],
+      "amount_stats": {
+        "avg_amount": 515000.0,
+        "max_amount": 680000.0,
+        "min_amount": 350000.0,
+        "total_amount": 1030000.0
+      },
+      "backers_stats": {
+        "avg_backers": 1562.0,
+        "max_backers": 1890.0,
+        "min_backers": 1234.0,
+        "total_backers": 3124.0
+      },
+      "success_rate_stats": {
+        "avg_success_rate": 345.0,
+        "max_success_rate": 350.0,
+        "min_success_rate": 340.0
+      }
+    },
+    "机器人": {
+      "category": "机器人",
+      "total_projects": 2,
+      "projects": [
+        {
+          "id": 5,
+          "name": "AI机械臂 Mini",
+          "amount_raised": "¥3,500,000",
+          "backers": "3,124",
+          "success_rate": "233%",
+          "status": "进行中",
+          "url": "https://www.zeczec.com/projects/ai-robot-arm"
+        },
+        {
+          "id": 10,
+          "name": "AI陪伴机器人",
+          "amount_raised": "¥2,400,000",
+          "backers": "2,890",
+          "success_rate": "240%",
+          "status": "进行中",
+          "url": "https://www.zeczec.com/projects/ai-companion-robot"
+        }
+      ],
+      "amount_stats": {
+        "avg_amount": 2950000.0,
+        "max_amount": 3500000.0,
+        "min_amount": 2400000.0,
+        "total_amount": 5900000.0
+      },
+      "backers_stats": {
+        "avg_backers": 3007.0,
+        "max_backers": 3124.0,
+        "min_backers": 2890.0,
+        "total_backers": 6014.0
+      },
+      "success_rate_stats": {
+        "avg_success_rate": 236.5,
+        "max_success_rate": 240.0,
+        "min_success_rate": 233.0
+      }
+    },
+    "AI配件": {
+      "category": "AI配件",
+      "total_projects": 1,
+      "projects": [
+        {
+          "id": 6,
+          "name": "AI手写板 Note",
+          "amount_raised": "¥420,000",
+          "backers": "987",
+          "success_rate": "280%",
+          "status": "已成功",
+          "url": "https://www.zeczec.com/projects/ai-note-pad"
+        }
+      ],
+      "amount_stats": {
+        "avg_amount": 420000.0,
+        "max_amount": 420000.0,
+        "min_amount": 420000.0,
+        "total_amount": 420000.0
+      },
+      "backers_stats": {
+        "avg_backers": 987.0,
+        "max_backers": 987.0,
+        "min_backers": 987.0,
+        "total_backers": 987.0
+      },
+      "success_rate_stats": {
+        "avg_success_rate": 280.0,
+        "max_success_rate": 280.0,
+        "min_success_rate": 280.0
+      }
+    }
+  },
+  "overall_trends": {
+    "monthly_projects": {
+      "2024-01": 1,
+      "2024-02": 1,
+      "2024-03": 2,
+      "2024-04": 2,
+      "2024-05": 2,
+      "2024-06": 2
+    },
+    "price_distribution": {
+      "100万+": 5,
+      "50-100万": 3,
+      "10-50万": 2,
+      "0-5万": 0,
+      "5-10万": 0
+    },
+    "backer_distribution": {
+      "1000-5000": 9,
+      "500-1000": 1,
+      "0-100": 0,
+      "100-500": 0,
+      "5000+": 0
+    }
+  }
+}

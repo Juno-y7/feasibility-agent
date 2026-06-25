@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI智能分身 - 产品可行性分析报告</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #e4e4e7;
+        }
+        
+        .glass-card {
+            background: rgba(30, 30, 46, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-item {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .nav-item:hover {
+            background: rgba(96, 165, 250, 0.15);
+            transform: translateX(4px);
+        }
+        
+        .nav-item.active {
+            background: rgba(96, 165, 250, 0.2);
+            border-left: 3px solid #60a5fa;
+        }
+        
+        .section-header {
+            position: relative;
+        }
+        
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            border-radius: 2px;
+        }
+        
+        .table-cell {
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .tag {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .tag-excellent { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        .tag-good { background: rgba(96, 165, 250, 0.2); color: #93c5fd; }
+        .tag-normal { background: rgba(251, 191, 36, 0.2); color: #fcd34d; }
+        .tag-poor { background: rgba(249, 115, 22, 0.2); color: #fdba74; }
+        .tag-risk { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+        
+        .canvas-section {
+            position: relative;
+            height: 280px;
+            width: 100%;
+        }
+        
+        .canvas-section-small {
+            position: relative;
+            height: 200px;
+            width: 100%;
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .link-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .link-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(96, 165, 250, 0.2);
+        }
+        
+        .business-model-box {
+            background: rgba(96, 165, 250, 0.08);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        
+        .pest-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 16px;
+            border-left: 4px solid;
+        }
+        
+        .pest-political { border-color: #ef4444; }
+        .pest-economic { border-color: #3b82f6; }
+        .pest-social { border-color: #10b981; }
+        .pest-technological { border-color: #8b5cf6; }
+        
+        .five-forces-item {
+            position: relative;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .force-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        
+        .force-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 1s ease;
+        }
+        
+        .swot-cell {
+            padding: 16px;
+            border-radius: 12px;
+        }
+        
+        .swot-strength { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); }
+        .swot-weakness { background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.2); }
+        .swot-opportunity { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); }
+        .swot-threat { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); }
+        
+        .priority-high { border-left: 4px solid #ef4444; }
+        .priority-medium { border-left: 4px solid #f59e0b; }
+        .priority-low { border-left: 4px solid #10b981; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in { animation: fadeIn 0.5s ease forwards; }
+    </style>
+</head>
+<body class="flex">
+    <aside class="w-72 fixed left-0 top-0 h-screen bg-[#16162a]/90 backdrop-blur-xl border-r border-white/5 flex flex-col z-50">
+        <div class="p-6 border-b border-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 6v6l4 2"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-lg font-semibold text-white">可行性分析</h1>
+                    <p class="text-xs text-gray-400">Product Feasibility</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-4 mx-4 mt-4 glass-card">
+            <div class="flex items-center justify-center relative">
+                <svg width="100" height="100" viewBox="0 0 100 100">
+                    <defs>
+                        <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#60a5fa" />
+                            <stop offset="100%" stop-color="#a78bfa" />
+                        </linearGradient>
+                    </defs>
+                    <circle cx="50" cy="50" r="45" fill="none" stroke-width="8" stroke="rgba(255,255,255,0.1)" />
+                    <circle cx="50" cy="50" r="45" fill="none" stroke-width="8" stroke="url(#scoreGradient)" 
+                            stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="82" />
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <span class="text-3xl font-bold gradient-text">71</span>
+                    <span class="text-xs text-gray-400">总分/100</span>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <span class="tag tag-normal">良好</span>
+                <p class="text-xs text-gray-400 mt-1">建议补强后继续</p>
+            </div>
+        </div>
+        
+        <nav class="flex-1 overflow-y-auto p-4 scrollbar-hide">
+            <div class="space-y-1">
+                <div onclick="scrollToSection('section0')" class="nav-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-gray-300 active">0. 执行摘要</div>
+                <div onclick="scrollToSection('section1')" class="nav-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-gray-400">1. 项目画像识别</div>
+                <div onclick="scrollToSection('section2')" class="nav-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-gray-400">2. 市场分析</div>
+                <div onclick="scrollToSection('section3')" class="nav-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-gray-400">3. PEST分析</div>
+                <div onclick="scrollToSection('section4')" class="nav-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-gray-400">4. 波特五力分析</div>
+                <div onclick="scrollToSection('section5')" class="nav-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-gray-400">5. SWOT分析</div>
+                <div onclick="scrollToSection('section6')" class="nav-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-gray-400">6. 商业模式画布</div>
+                <div onclick="scrollToSection('section7')" class="nav-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-gray-400">7. 竞品案例研究</div>
+                <div onclick="scrollToSection('section8')" class="nav-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-gray-400">8. 市场规模估算</div>
+                <div onclick="scrollToSection('section9')" class="nav-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-gray-400">9. 财务模型分析</div>
+                <div onclick="scrollToSection('section10')" class="nav-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-gray-400">10. 增长飞轮分析</div>
+                <div onclick="scrollToSection('section11')" class="nav-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-gray-400">11. 技术架构评估</div>
+                <div onclick="scrollToSection('section12')" class="nav-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-gray-400">12. 可行性评分</div>
+                <div onclick="scrollToSection('section13')" class="nav-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-gray-400">13. 行动建议</div>
+                <div onclick="scrollToSection('section14')" class="nav-item w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-gray-400">14. 沟通话术</div>
+            </div>
+        </nav>
+        
+        <div class="p-4 border-t border-white/5">
+            <p class="text-xs text-gray-500 text-center">
+                生成时间：2026年6月24日<br>
+                版本：v2.2.0
+            </p>
+        </div>
+    </aside>
+    
+    <main class="ml-72 min-h-screen p-8">
+        <div class="max-w-5xl mx-auto space-y-8">
+            <div id="section0" class="glass-card p-8 fade-in">
+                <h2 class="section-header text-2xl font-bold text-white mb-6">执行摘要</h2>
+                
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-200 mb-3">项目概述</h3>
+                        <p class="text-gray-400 leading-relaxed">
+                            AI智能分身是一款面向空巢老人家庭的实体化AI亲情陪伴装置，通过3D人像、声音复刻和家庭记忆库，让不在身边的子女以更具存在感的方式参与老人日常生活。
+                        </p>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-200 mb-3">核心结论</h3>
+                        <ul class="space-y-2 text-gray-400">
+                            <li class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                情感陪伴痛点真实，市场需求明确
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                实体化产品在募资平台具有展示优势
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                                数据隐私和交付闭环是主要风险
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                建议重点补强品牌建设和用户案例积累
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-4 gap-4 mt-8">
+                    <div class="bg-white/5 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold gradient-text">71/100</div>
+                        <div class="text-xs text-gray-400 mt-1">综合评分</div>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold text-blue-400">¥50亿</div>
+                        <div class="text-xs text-gray-400 mt-1">细分市场规模</div>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold text-green-400">45%</div>
+                        <div class="text-xs text-gray-400 mt-1">毛利率</div>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold text-purple-400">6个月</div>
+                        <div class="text-xs text-gray-400 mt-1">投资回收期</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="section1" class="glass-card p-8 fade-in">
+                <h2 class="section-header text-2xl font-bold text-white mb-6">一、项目画像识别</h2>
+                
+                <div class="grid grid-cols-3 gap-6">
+                    <div class="col-span-2">
+                        <h3 class="text-lg font-semibold text-gray-200 mb-3">产品定位</h3>
+                        <p class="text-gray-400 leading-relaxed">
+                            空蓝数据推出的实体化AI分身定制产品，通过3D打印模型接入AI技术，支持真人形象复刻及虚拟人物定制（含动漫角色、游戏角色等）。产品可作为亲情陪伴装置，让不在身边的子女以更具存在感的方式参与老人日常生活，也可满足年轻群体对虚拟偶像、游戏角色的实体化情感寄托需求。
+                        </p>
+                        
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            <span class="tag tag-good">AI硬件</span>
+                            <span class="tag tag-normal">3D打印</span>
+                            <span class="tag tag-good">情感陪伴</span>
+                            <span class="tag tag-normal">银发经济</span>
+                            <span class="tag tag-good">虚拟偶像</span>
+                            <span class="tag tag-normal">定制化</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-200 mb-3">产品实物图</h3>
+                        <div class="rounded-xl overflow-hidden bg-gradient-to-br from-blue-500/20 to-purple-500/20 aspect-square flex items-center justify-center">
+                            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=premium%203D%20printed%20hyperrealistic%20human%20bust%20sculpture%2C%20man%20in%20tailored%20black%20suit%20with%20royal%20blue%20tie%2C%20exquisite%20facial%20details%2C%20sitting%20on%20polished%20aluminum%20smart%20speaker%20base%2C%20subtle%20warm%20LED%20glow%20from%20base%2C%20luxury%20product%20photography%2C%20dark%20moody%20background%2C%20dramatic%20side%20lighting%2C%20soft%20rim%20light%2C%208k%20ultra%20detailed%2C%20commercial%20advertising%20style%2C%20award%20winning%20photography&image_size=square_hd" 
+                                 alt="AI智能分身实物图" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8">
+                    <h3 class="text-lg font-semibold text-gray-200 mb-3">用户分层</h3>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="bg-white/5 rounded-xl p-4">
+                            <div class="text-blue-400 font-bold mb-2">银发场景使用者</div>
+                            <div class="text-sm text-gray-300">子女不在身边的老人</div>
+                            <div class="text-xs text-gray-500 mt-2">诉求：陪伴、问候、熟悉感</div>
+                        </div>
+                        <div class="bg-white/5 rounded-xl p-4">
+                            <div class="text-purple-400 font-bold mb-2">银发场景购买者</div>
+                            <div class="text-sm text-gray-300">30-55岁成年子女</div>
+                            <div class="text-xs text-gray-500 mt-2">诉求：减少愧疚感、表达孝心</div>
+                        </div>
+                        <div class="bg-white/5 rounded-xl p-4">
+                            <div class="text-green-400 font-bold mb-2">年轻消费群体</div>
+                            <div class="text-sm text-gray-300">Z世代动漫/游戏爱好者</div>
+                            <div class="text-xs text-gray-500 mt-2">诉求：虚拟偶像实体化、情感寄托</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8">
+                    <h3 class="text-lg font-semibold text-gray-200 mb-3">产品版本规划</h3>
+                    <div class="grid grid-cols-4 gap-4">
+                        <div class="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 text-center">
+                            <div class="text-lg font-bold text-blue-400">A款</div>
+                            <div class="text-xs text-gray-400 mt-1">基础款</div>
+                            <div class="text-xs text-gray-500">3D打印模型，标准上色，固定对话</div>
+                        </div>
+                        <div class="bg-purple-500/10 border border-purple-500/20 rounded-xl p-4 text-center">
+                            <div class="text-lg font-bold text-purple-400">B款</div>
+                            <div class="text-xs text-gray-400 mt-1">语音款</div>
+                            <div class="text-xs text-gray-500">模型定制，精准上色，定制音色</div>
+                        </div>
+                        <div class="bg-green-500/10 border border-green-500/20 rounded-xl p-4 text-center">
+                            <div class="text-lg font-bold text-green-400">C款</div>
+                            <div class="text-xs text-gray-400 mt-1">上色款</div>
+                            <div class="text-xs text-gray-500">模型进行精准上色</div>
+                        </div>
+                        <div class="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4 text-center">
+                            <div class="text-lg font-bold text-orange-400">D款</div>
+                            <div class="text-xs text-gray-400 mt-1">完全款</div>
+                            <div class="text-xs text-gray-500">模型精准上色，定制音色</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="section2" class="glass-card p-8 fade-in">
+                <h2 class="section-header text-2xl font-bold text-white mb-6">二、市场分析</h2>
+                
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="canvas-section">
+                        <h3 class="text-sm text-gray-400 mb-2">AI硬件市场规模趋势</h3>
+                        <canvas id="marketTrendChart"></canvas>
+                    </div>
+                    <div class="canvas-section">
+                        <h3 class="text-sm text-gray-400 mb-2">细分品类市场份额</h3>
+                        <canvas id="categoryShareChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="mt-8">
+                    <h3 class="text-lg font-semibold text-gray-200 mb-3">市场趋势分析</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white/5 rounded-xl p-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                                <span class="font-medium text-white">老龄化加剧</span>
+                            </div>
+                            <p class="text-sm text-gray-400">中国60岁以上人口超2.8亿，空巢老人1.2亿，情感陪伴需求巨大</p>
+                        </div>
+                        <div class="bg-white/5 rounded-xl p-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                                <span class="font-medium text-white">AI技术成熟</span>
+                            </div>
+                            <p class="text-sm text-gray-400">语音合成、3D建模、大语言模型技术日趋成熟，成本下降</p>
+                        </div>
+                        <div class="bg-white/5 rounded-xl p-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                                <span class="font-medium text-white">消费升级</span>
+                            </div>
+                            <p class="text-sm text-gray-400">家庭愿意为情感陪伴、健康关怀类产品支付溢价</p>
+                        </div>
+                        <div class="bg-white/5 rounded-xl p-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                                <span class="font-medium text-white">远程办公普及</span>
+                            </div>
+                            <p class="text-sm text-gray-400">子女与父母物理距离增加，催生远程陪伴需求</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="section3" class="glass-card p-8 fade-in">
+                <h2 class="section-header text-2xl font-bold text-white mb-6">三、PEST分析</h2>
+                
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="pest-item pest-political">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21l1.65-3.8a9 9 0 113.4 2.9L3 21"></path>
+                            </svg>
+                            <span class="font-medium text-white">政治因素</span>
+                        </div>
+                        <ul class="text-sm text-gray-400 space-y-1">
+                            <li>• 国家支持银发经济发展</li>
+                            <li>• 数据隐私保护法规严格</li>
+                            <li>• 人工智能伦理规范逐步完善</li>
+                        </ul>
+                    </div>
+                    <div class="pest-item pest-economic">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="font-medium text-white">经济因素</span>
+                        </div>
+                        <ul class="text-sm text-gray-400 space-y-1">
+                            <li>• 居民可支配收入增长</li>
+                            <li>• 家庭愿意为健康与情感付费</li>
+                            <li>• AI硬件成本持续下降</li>
+                        </ul>
+                    </div>
+                    <div class="pest-item pest-social">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                            <span class="font-medium text-white">社会因素</span>
+                        </ul>
+                        <ul class="text-sm text-gray-400 space-y-1">
+                            <li>• 老龄化社会加剧</li>
+                            <li>• 空巢老人情感需求突出</li>
+                            <li>• 子女孝心消费意愿强</li>
+                        </ul>
+                    </div>
+                    <div class="pest-item pest-technological">
+                        <div class="flex items-center gap-2 mb-2">
+                            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            <span class="font-medium text-white">技术因素</span>
+                        </div>
+                        <ul class="text-sm text-gray-400 space-y-1">
+                            <li>• 语音合成技术成熟</li>
+                            <li>• 3D打印成本下降</li>
+                            <li>• 大语言模型赋能对话</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="section4" class="glass-card p-8 fade-in">
+                <h2 class="section-header text-2xl font-bold text-white mb-6">四、波特五力分析</h2>
+                
+                <div class="space-y-4">
+                    <div class="five-forces-item">
+                        <div class="flex justify-between items-center">
+                            <span class="font-medium text-white">现有竞争者威胁</span>
+                            <span class="tag tag-poor">中高</span>
+                        </div>
+                        <div class="force-bar">
+                            <div class="force-fill bg-orange-500" style="width: 75%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">AI硬件赛道竞争激烈，智能音箱、陪伴机器人等竞品众多</p>
+                    </div>
+                    <div class="five-forces-item">
+                        <div class="flex justify-between items-center">
+                            <span class="font-medium text-white">潜在进入者威胁</span>
+                            <span class="tag tag-normal">中等</span>
+                        </div>
+                        <div class="force-bar">
+                            <div class="force-fill bg-yellow-500" style="width: 55%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">技术门槛不高，但品牌和渠道壁垒存在</p>
+                    </div>
+                    <div class="five-forces-item">
+                        <div class="flex justify-between items-center">
+                            <span class="font-medium text-white">替代品威胁</span>
+                            <span class="tag tag-good">中低</span>
+                        </div>
+                        <div class="force-bar">
+                            <div class="force-fill bg-blue-500" style="width: 40%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">实体化陪伴体验难以被纯软件替代</p>
+                    </div>
+                    <div class="five-forces-item">
+                        <div class="flex justify-between items-center">
+                            <span class="font-medium text-white">供应商议价能力</span>
+                            <span class="tag tag-normal">中等</span>
+                        </div>
+                        <div class="force-bar">
+                            <div class="force-fill bg-yellow-500" style="width: 50%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">3D打印、电子元器件供应商较多，但定制化需求可能受限</p>
+                    </div>
+                    <div class="five-forces-item">
+                        <div class="flex justify-between items-center">
+                            <span class="font-medium text-white">购买者议价能力</span>
+                            <span class="tag tag-poor">中高</span>
+                        </div>
+                        <div class="force-bar">
+                            <div class="force-fill bg-orange-500" style="width: 70%"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">消费者对价格敏感，比价渠道多，决策周期长</p>
+                    </div>
+                </div>
+                
+                <div class="mt-6 bg-white/5 rounded-xl p-4">
+                    <h4 class="font-medium text-white mb-2">竞争战略建议</h4>
+                    <ul class="text-sm text-gray-400 space-y-1">
+                        <li>• 通过情感陪伴的差异化定位避开直接竞争</li>
+                        <li>• 建立品牌信任和用户口碑形成护城河</li>
+                        <li>• 通过规模化降低成本，提升价格竞争力</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div id="section5" class="glass-card p-8 fade-in">
+                <h2 class="section-header text-2xl font-bold text-white mb-6">五、SWOT分析</h2>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="swot-cell swot-strength">
+                        <div class="flex items-center gap-2 mb-3">
+                            <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="font-bold text-green-400">优势 (Strengths)</span>
+                        </div>
+                        <ul class="text-sm text-gray-300 space-y-2">
+                            <li>✓ 产品已成型，有实体样机和实物产品</li>
+                            <li>✓ 支持真人/虚拟人物定制（含动漫角色等）</li>
+                            <li>✓ 情感陪伴痛点真实，情绪叙事强</li>
+                            <li>✓ 四款产品分层清晰，覆盖不同价位</li>
+                            <li>✓ 3D打印+AI技术路线成熟可行</li>
+                        </ul>
+                    </div>
+                    <div class="swot-cell swot-weakness">
+                        <div class="flex items-center gap-2 mb-3">
+                            <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            <span class="font-bold text-orange-400">劣势 (Weaknesses)</span>
+                        </div>
+                        <ul class="text-sm text-gray-300 space-y-2">
+                            <li>✗ 品牌知名度低，市场认知度不足</li>
+                            <li>✗ 定价策略待优化，套餐价值感待提升</li>
+                            <li>✗ 交付周期和量产能力待明确</li>
+                            <li>✗ 数据授权与隐私保护机制待完善</li>
+                            <li>✗ 用户试用反馈和案例积累不足</li>
+                        </ul>
+                    </div>
+                    <div class="swot-cell swot-opportunity">
+                        <div class="flex items-center gap-2 mb-3">
+                            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            <span class="font-bold text-blue-400">机会 (Opportunities)</span>
+                        </div>
+                        <ul class="text-sm text-gray-300 space-y-2">
+                            <li>✓ 老龄化社会带来亲情陪伴刚需</li>
+                            <li>✓ 虚拟偶像/游戏角色情感消费快速增长</li>
+                            <li>✓ 情感陪伴赛道竞争较少</li>
+                            <li>✓ 实体化产品适合募资展示</li>
+                            <li>✓ 短视频传播潜力大，虚拟人物内容易出圈</li>
+                        </ul>
+                    </div>
+                    <div class="swot-cell swot-threat">
+                        <div class="flex items-center gap-2 mb-3">
+                            <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                            <span class="font-bold text-red-400">威胁 (Threats)</span>
+                        </div>
+                        <ul class="text-sm text-gray-300 space-y-2">
+                            <li>✗ 数据隐私合规风险高</li>
+                            <li>✗ 虚拟人物定制存在版权风险</li>
+                            <li>✗ 硬件交付周期和量产能力待验证</li>
+                            <li>✗ 大厂可能进入该赛道</li>
+                            <li>✗ 用户接受度存在不确定性</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="section6" class="glass-card p-8 fade-in">
+                <h2 class="section-header text-2xl font-bold text-white mb-6">六、商业模式画布</h2>
+                
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="business-model-box">
+                        <div class="text-blue-400 font-bold mb-2">关键伙伴</div>
+                        <ul class="text-sm text-gray-400 space-y-1">
+                            <li>• 3D打印服务商</li>
+                            <li>• AI技术供应商</li>
+                            <li>• 电子元器件供应商</li>
+                            <li>• 募资平台(Kickstarter/嘖嘖)</li>
+                        </ul>
+                    </div>
+                    <div class="business-model-box">
+                        <div class="text-blue-400 font-bold mb-2">关键活动</div>
+                        <ul class="text-sm text-gray-400 space-y-1">
+                            <li>• 产品研发与迭代</li>
+                            <li>• 用户数据采集与处理</li>
+                            <li>• 供应链管理</li>
+                            <li>• 营销与推广</li>
+                        </ul>
+                    </div>
+                    <div class="business-model-box">
+                        <div class="text-blue-400 font-bold mb-2">关键资源</div>
+                        <ul class="text-sm text-gray-400 space-y-1">
+                            <li>• AI技术团队</li>
+                            <li>• 产品设计能力</li>
+                            <li>• 供应链资源</li>
+                            <li>• 用户数据</li>
+                        </ul>
+                    </div>
+                    <div class="business-model-box">
+                        <div class="text-blue-400 font-bold mb-2">价值主张</div>
+                        <ul class="text-sm text-gray-400 space-y-1">
+                            <li>• 实体化情感陪伴</li>
+                            <li>• 个性化声音与形象</li>
+                            <li>• 家庭记忆传承</li>
+                            <li>• 减少子女愧疚感</li>
+                        </ul>
+                    </div>
+                    <div class="business-model-box">
+                        <div class="text-blue-400 font-bold mb-2">客户关系</div>
+                        <ul class="text-sm text-gray-400 space-y-1">
+                            <li>• 一对一客服支持</li>
+                            <li>• 用户社区运营</li>
+                            <li>• 定期产品更新</li>
+                            <li>• 用户反馈收集</li>
+                        </ul>
+                    </div>
+                    <div class="business-model-box">
+                        <div class="text-blue-400 font-bold mb-2">渠道通路</div>
+                        <ul class="text-sm text-gray-400 space-y-1">
+                            <li>• 募资平台首发</li>
+                            <li>• 电商平台销售</li>
+                            <li>• 社交媒体推广</li>
+                            <li>• 线下体验活动</li>
+                        </ul>
+                    </div>
+                    <div class="business-model-box">
+                        <div class="text-blue-400 font-bold mb-2">客户细分</div>
+                        <ul class="text-sm text-gray-400 space-y-1">
+                            <li>• 使用者：空巢老人</li>
+                            <li>• 购买者：成年子女</li>
+                            <li>• 礼品购买者：孝心礼品</li>
+                            <li>• B2B客户：养老机构</li>
+                        </ul>
+                    </div>
+                    <div class="business-model-box">
+                        <div class="text-blue-400 font-bold mb-2">成本结构</div>
+                        <ul class="text-sm text-gray-400 space-y-1">
+                            <li>• 硬件/BOM成本(40%)</li>
+                            <li>• 制造成本(25%)</li>
+                            <li>• 营销成本(20%)</li>
+                            <li>• 运营成本(15%)</li>
+                        </ul>
+                    </div>
+                    <div class="business-model-box">
+                        <div class="text-blue-400 font-bold mb-2">收入来源</div>
+                        <ul class="text-sm text-gray-400 space-y-1">
+                            <li>• 硬件产品销售</li>
+                            <li>• 订阅服务(AI对话)</li>
+                            <li>• 定制化服务费</li>
+                            <li>• 增值服务(记忆库扩容)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="section7" class="glass-card p-8 fade-in">
+                <h2 class="section-header text-2xl font-bold text-white mb-6">七、竞品案例研究</h2>
+                
+                <p class="text-gray-400 mb-6">以下案例均来自真实募资平台，点击卡片可查看项目详情</p>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <a href="https://www.kickstarter.com/projects/rokid/new-rokid-glassesworlds-lighest-full-function-ai-glasses" target="_blank" class="link-card bg-white/5 rounded-xl p-4 border border-white/10">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-bold text-white">Rokid Glasses</span>
+                            <span class="tag tag-excellent">成功</span>
+                        </div>
+                        <div class="text-xs text-gray-400 mb-2">Kickstarter · 2025年10月</div>
+                        <div class="text-sm text-gray-300 mb-2">全球最轻全功能AI&AR眼镜(49g)</div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-blue-400">$361万</span>
+                            <span class="text-gray-500">5,000+支持者</span>
+                        </div>
+                    </a>
+                    <a href="https://www.kickstarter.com/projects/tiinyai/tiiny-ai-pocket-lab" target="_blank" class="link-card bg-white/5 rounded-xl p-4 border border-white/10">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-bold text-white">Tiiny AI Pocket Lab</span>
+                            <span class="tag tag-excellent">成功</span>
+                        </div>
+                        <div class="text-xs text-gray-400 mb-2">Kickstarter · 2026年3月</div>
+                        <div class="text-sm text-gray-300 mb-2">口袋大小的AI超级计算机</div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-blue-400">$100万+</span>
+                            <span class="text-gray-500">728+支持者</span>
+                        </div>
+                    </a>
+                    <a href="https://www.kickstarter.com/projects/caira/caira-ai-camera" target="_blank" class="link-card bg-white/5 rounded-xl p-4 border border-white/10">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-bold text-white">Caira Camera</span>
+                            <span class="tag tag-excellent">成功</span>
+                        </div>
+                        <div class="text-xs text-gray-400 mb-2">Kickstarter · 2025年11月</div>
+                        <div class="text-sm text-gray-300 mb-2">内置生成式AI的智能相机</div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-blue-400">$300万+</span>
+                            <span class="text-gray-500">120,000+支持者</span>
+                        </div>
+                    </a>
+                    <a href="https://www.kickstarter.com/projects/eiliko/eiliko-ai-charm-bot" target="_blank" class="link-card bg-white/5 rounded-xl p-4 border border-white/10">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-bold text-white">Eiliko AI Charm Bot</span>
+                            <span class="tag tag-excellent">成功</span>
+                        </div>
+                        <div class="text-xs text-gray-400 mb-2">Kickstarter · 2025年</div>
+                        <div class="text-sm text-gray-300 mb-2">情感陪伴定位的可穿戴机器人</div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-blue-400">$38万</span>
+                            <span class="text-gray-500">3,000+支持者</span>
+                        </div>
+                    </a>
+                    <a href="https://www.kickstarter.com/projects/ugreen/ugreen-nasync-next-level-storage-limitless-possibilities" target="_blank" class="link-card bg-white/5 rounded-xl p-4 border border-white/10">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-bold text-white">UGREEN NASync</span>
+                            <span class="tag tag-excellent">成功</span>
+                        </div>
+                        <div class="text-xs text-gray-400 mb-2">Kickstarter · 2025年</div>
+                        <div class="text-sm text-gray-300 mb-2">AI照片管理与本地存储</div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-blue-400">$667万</span>
+                            <span class="text-gray-500">13,285支持者</span>
+                        </div>
+                    </a>
+                    <a href="https://www.indiegogo.com/en/projects/photon-matrix-ai-laser-mosquito-killer" target="_blank" class="link-card bg-white/5 rounded-xl p-4 border border-white/10">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-bold text-white">Photon Matrix</span>
+                            <span class="tag tag-excellent">成功</span>
+                        </div>
+                        <div class="text-xs text-gray-400 mb-2">Indiegogo · 2025年5月</div>
+                        <div class="text-sm text-gray-300 mb-2">AI激光灭蚊器(TikTok走红)</div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-blue-400">$250万</span>
+                            <span class="text-gray-500">3,500+支持者</span>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="mt-6 bg-white/5 rounded-xl p-4">
+                    <h4 class="font-medium text-white mb-2">案例经验总结</h4>
+                    <ul class="text-sm text-gray-400 space-y-1">
+                        <li>• 情感陪伴是高潜力细分市场（Eiliko达成率3,800%）</li>
+                        <li>• 隐私保护是重要卖点（Tiiny、UGREEN均强调本地存储）</li>
+                        <li>• 差异化定位很重要（Halliday隐形显示、Photon激光灭蚊）</li>
+                        <li>• 社交媒体推广至关重要（Photon靠TikTok病毒传播）</li>
+                        <li>• 专业用户愿意为高性能AI硬件付费（Tiiny定价$1,299）</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div id="section8" class="glass-card p-8 fade-in">
+                <h2 class="section-header text-2xl font-bold text-white mb-6">八、市场规模估算</h2>
+                
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="bg-gradient-to-br from-blue-500/20 to-blue-600/10 rounded-xl p-6 border border-blue-500/20">
+                        <div class="text-xs text-gray-400 mb-1">TAM</div>
+                        <div class="text-2xl font-bold text-blue-400">$800亿</div>
+                        <div class="text-xs text-gray-500 mt-1">全球AI硬件市场</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-500/20 to-purple-600/10 rounded-xl p-6 border border-purple-500/20">
+                        <div class="text-xs text-gray-400 mb-1">SAM</div>
+                        <div class="text-2xl font-bold text-purple-400">¥2,000亿</div>
+                        <div class="text-xs text-gray-500 mt-1">中国智能硬件市场</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-green-500/20 to-green-600/10 rounded-xl p-6 border border-green-500/20">
+                        <div class="text-xs text-gray-400 mb-1">SOM</div>
+                        <div class="text-2xl font-bold text-green-400">¥50亿</div>
+                        <div class="text-xs text-gray-500 mt-1">情感陪伴细分市场</div>
+                    </div>
+                </div>
+                
+                <div class="canvas-section">
+                    <h3 class="text-sm text-gray-400 mb-2">TAM/SAM/SOM市场规模对比</h3>
+                    <canvas id="marketSizingChart"></canvas>
+                </div>
+                
+                <div class="mt-6">
+                    <h3 class="text-lg font-semibold text-gray-200 mb-3">市场规模评分</h3>
+                    <div class="flex items-center gap-4">
+                        <span class="text-gray-400">得分：</span>
+                        <span class="tag tag-good">4/5</span>
+                        <span class="text-gray-400">老龄化市场增长空间大，情感陪伴赛道竞争相对较少</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="section9" class="glass-card p-8 fade-in">
+                <h2 class="section-header text-2xl font-bold text-white mb-6">九、财务模型分析</h2>
+                
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-200 mb-3">收入预测</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">目标募资金额</span>
+                                <span class="text-white font-medium">¥500,000</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">预计支持者数量</span>
+                                <span class="text-white font-medium">500人</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">平均单价</span>
+                                <span class="text-white font-medium">¥1,000</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">平台费 + 支付手续费</span>
+                                <span class="text-white font-medium">10%</span>
+                            </div>
+                            <div class="border-t border-white/10 pt-3 flex justify-between">
+                                <span class="text-gray-300 font-medium">实际到手收入</span>
+                                <span class="text-green-400 font-bold">¥450,000</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-200 mb-3">成本结构</h3>
+                        <div class="canvas-section-small">
+                            <canvas id="costStructureChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-4 mt-6">
+                    <div class="bg-white/5 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold text-green-400">45%</div>
+                        <div class="text-xs text-gray-400 mt-1">毛利率</div>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold text-blue-400">222件</div>
+                        <div class="text-xs text-gray-400 mt-1">盈亏平衡点</div>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold text-purple-400">6个月</div>
+                        <div class="text-xs text-gray-400 mt-1">投资回收期</div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 bg-white/5 rounded-xl p-4">
+                    <h4 class="font-medium text-white mb-2">财务健康度评分</h4>
+                    <div class="flex items-center gap-4">
+                        <span class="text-gray-400">得分：</span>
+                        <span class="tag tag-good">4/5</span>
+                        <span class="text-gray-400">毛利率合理(45%)，回收期可控(6个月)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="section10" class="glass-card p-8 fade-in">
+                <h2 class="section-header text-2xl font-bold text-white mb-6">十、增长飞轮分析</h2>
+                
+                <div class="relative bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl p-8 border border-blue-500/20 mb-6">
+                    <h3 class="text-lg font-semibold text-white mb-6 text-center">增长飞轮结构</h3>
+                    <div class="flex justify-center">
+                        <div class="relative w-80 h-80">
+                            <svg class="w-full h-full" viewBox="0 0 200 200">
+                                <defs>
+                                    <linearGradient id="flywheelGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#60a5fa" stop-opacity="0.3" />
+                                        <stop offset="100%" stop-color="#a78bfa" stop-opacity="0.3" />
+                                    </linearGradient>
+                                </defs>
+                                <circle cx="100" cy="100" r="80" fill="url(#flywheelGradient)" stroke="rgba(96,165,250,0.5)" stroke-width="2" />
+                                <circle cx="100" cy="100" r="60" fill="none" stroke="rgba(96,165,250,0.3)" stroke-width="1" />
+                                <circle cx="100" cy="100" r="40" fill="none" stroke="rgba(96,165,250,0.3)" stroke-width="1" />
+                                <circle cx="100" cy="100" r="5" fill="#60a5fa" />
+                                <path d="M100 20 L100 40 M100 160 L100 180 M20 100 L40 100 M160 100 L180 100" stroke="rgba(96,165,250,0.5)" stroke-width="2" />
+                            </svg>
+                            <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full">
+                                <div class="bg-white/10 rounded-xl px-4 py-2 text-center">
+                                    <div class="text-sm font-medium text-gray-200">口碑传播</div>
+                                </div>
+                            </div>
+                            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full">
+                                <div class="bg-white/10 rounded-xl px-4 py-2 text-center">
+                                    <div class="text-sm font-medium text-gray-200">用户增长</div>
+                                </div>
+                            </div>
+                            <div class="absolute top-1/2 right-0 -translate-y-1/2 translate-x-full">
+                                <div class="bg-white/10 rounded-xl px-4 py-2 text-center">
+                                    <div class="text-sm font-medium text-gray-200">数据积累</div>
+                                </div>
+                            </div>
+                            <div class="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-full">
+                                <div class="bg-white/10 rounded-xl px-4 py-2 text-center">
+                                    <div class="text-sm font-medium text-gray-200">模型优化</div>
+                                </div>
+                            </div>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="text-center">
+                                    <div class="text-xl font-bold text-blue-400">产品销售</div>
+                                    <div class="text-xs text-gray-400 mt-1">核心驱动</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="bg-white/5 rounded-xl p-4">
+                        <div class="text-blue-400 font-bold mb-2">冷启动</div>
+                        <div class="text-xs text-gray-400 mb-2">0-1000用户</div>
+                        <div class="text-sm text-gray-300">验证产品价值</div>
+                        <div class="text-xs text-gray-500 mt-2">策略：种子用户、KOL合作</div>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-4">
+                        <div class="text-purple-400 font-bold mb-2">增长期</div>
+                        <div class="text-xs text-gray-400 mb-2">1000-10000用户</div>
+                        <div class="text-sm text-gray-300">扩大用户规模</div>
+                        <div class="text-xs text-gray-500 mt-2">策略：付费推广、内容营销</div>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-4">
+                        <div class="text-green-400 font-bold mb-2">规模化</div>
+                        <div class="text-xs text-gray-400 mb-2">10000+用户</div>
+                        <div class="text-sm text-gray-300">建立竞争壁垒</div>
+                        <div class="text-xs text-gray-500 mt-2">策略：品牌建设、渠道拓展</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="section11" class="glass-card p-8 fade-in">
+                <h2 class="section-header text-2xl font-bold text-white mb-6">十一、技术架构评估</h2>
+                
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-200 mb-3">技术可行性</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-400">技术栈成熟度</span>
+                                <span class="tag tag-good">中高</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-400">技术复杂度</span>
+                                <span class="tag tag-normal">中等</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-400">供应链可靠性</span>
+                                <span class="tag tag-poor">中低</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-400">安全合规</span>
+                                <span class="tag tag-poor">中低</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-400">扩展性</span>
+                                <span class="tag tag-good">中高</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-200 mb-3">技术风险清单</h3>
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2 text-red-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                                <span class="text-sm">数据隐私安全</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-red-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                                <span class="text-sm">供应链稳定性</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-orange-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="text-sm">3D打印精度控制</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-orange-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="text-sm">AI对话自然度</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-orange-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="text-sm">虚拟人物版权合规</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="section12" class="glass-card p-8 fade-in">
+                <h2 class="section-header text-2xl font-bold text-white mb-6">十二、可行性评分</h2>
+                
+                <div class="canvas-section">
+                    <h3 class="text-sm text-gray-400 mb-2">各维度评分雷达图</h3>
+                    <canvas id="scoringRadarChart"></canvas>
+                </div>
+                
+                <div class="mt-6 overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left text-sm text-gray-400">
+                                <th class="pb-3 font-medium">评估维度</th>
+                                <th class="pb-3 font-medium">得分</th>
+                                <th class="pb-3 font-medium">权重</th>
+                                <th class="pb-3 font-medium">加权分</th>
+                                <th class="pb-3 font-medium">说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="table-cell py-3">痛点强度</td>
+                                <td class="table-cell py-3"><span class="tag tag-good">12/15</span></td>
+                                <td class="table-cell py-3">15</td>
+                                <td class="table-cell py-3">12</td>
+                                <td class="table-cell py-3 text-gray-400">情感陪伴痛点真实，情绪叙事强</td>
+                            </tr>
+                            <tr>
+                                <td class="table-cell py-3">目标用户清晰度</td>
+                                <td class="table-cell py-3"><span class="tag tag-good">8/10</span></td>
+                                <td class="table-cell py-3">10</td>
+                                <td class="table-cell py-3">8</td>
+                                <td class="table-cell py-3 text-gray-400">用户分层清晰，但买单者仍需验证</td>
+                            </tr>
+                            <tr>
+                                <td class="table-cell py-3">竞争壁垒</td>
+                                <td class="table-cell py-3"><span class="tag tag-normal">5/10</span></td>
+                                <td class="table-cell py-3">10</td>
+                                <td class="table-cell py-3">5</td>
+                                <td class="table-cell py-3 text-gray-400">技术门槛不高，需建立品牌壁垒</td>
+                            </tr>
+                            <tr>
+                                <td class="table-cell py-3">产品可演示性</td>
+                                <td class="table-cell py-3"><span class="tag tag-good">10/10</span></td>
+                                <td class="table-cell py-3">10</td>
+                                <td class="table-cell py-3">10</td>
+                                <td class="table-cell py-3 text-gray-400">实体产品已成型，支持真人/虚拟人物定制</td>
+                            </tr>
+                            <tr>
+                                <td class="table-cell py-3">技术/生产可行性</td>
+                                <td class="table-cell py-3"><span class="tag tag-normal">7/10</span></td>
+                                <td class="table-cell py-3">10</td>
+                                <td class="table-cell py-3">7</td>
+                                <td class="table-cell py-3 text-gray-400">3D打印+AI技术路线成熟，产品已验证</td>
+                            </tr>
+                            <tr>
+                                <td class="table-cell py-3">合规与信任</td>
+                                <td class="table-cell py-3"><span class="tag tag-poor">4/10</span></td>
+                                <td class="table-cell py-3">10</td>
+                                <td class="table-cell py-3">4</td>
+                                <td class="table-cell py-3 text-gray-400">隐私授权机制不完善，信任成本高</td>
+                            </tr>
+                            <tr>
+                                <td class="table-cell py-3">商业模式</td>
+                                <td class="table-cell py-3"><span class="tag tag-normal">7/10</span></td>
+                                <td class="table-cell py-3">10</td>
+                                <td class="table-cell py-3">7</td>
+                                <td class="table-cell py-3 text-gray-400">四款产品分层清晰，覆盖多元场景</td>
+                            </tr>
+                            <tr>
+                                <td class="table-cell py-3">市场推广可行性</td>
+                                <td class="table-cell py-3"><span class="tag tag-good">8/10</span></td>
+                                <td class="table-cell py-3">10</td>
+                                <td class="table-cell py-3">8</td>
+                                <td class="table-cell py-3 text-gray-400">情感故事+虚拟人物定制，双重传播点</td>
+                            </tr>
+                            <tr>
+                                <td class="table-cell py-3">团队匹配度</td>
+                                <td class="table-cell py-3"><span class="tag tag-normal">6/10</span></td>
+                                <td class="table-cell py-3">10</td>
+                                <td class="table-cell py-3">6</td>
+                                <td class="table-cell py-3 text-gray-400">团队背景可包装，但需证据支撑</td>
+                            </tr>
+                            <tr>
+                                <td class="table-cell py-3">证据完整度</td>
+                                <td class="table-cell py-3"><span class="tag tag-normal">4/5</span></td>
+                                <td class="table-cell py-3">5</td>
+                                <td class="table-cell py-3">4</td>
+                                <td class="table-cell py-3 text-gray-400">已有实物产品，用户案例待积累</td>
+                            </tr>
+                            <tr class="border-t border-white/20">
+                                <td class="table-cell py-3 font-medium text-white">总分</td>
+                                <td class="table-cell py-3"></td>
+                                <td class="table-cell py-3 font-medium">100</td>
+                                <td class="table-cell py-3 font-bold text-white">71</td>
+                                <td class="table-cell py-3"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="section13" class="glass-card p-8 fade-in">
+                <h2 class="section-header text-2xl font-bold text-white mb-6">十三、行动建议</h2>
+                
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-200 mb-3">7天验证任务</h3>
+                        <div class="space-y-3">
+                            <div class="priority-high bg-red-500/5 rounded-xl p-4">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
+                                        <span class="text-red-400 font-bold">1</span>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-white">制作产品展示与试用案例视频</div>
+                                        <div class="text-sm text-gray-400 mt-1">展示真人/虚拟人物定制效果，记录真实用户试用反馈</div>
+                                        <div class="text-xs text-gray-500 mt-2">负责人：产品团队 | 截止：第3天</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="priority-high bg-red-500/5 rounded-xl p-4">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
+                                        <span class="text-red-400 font-bold">2</span>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-white">制定定价套餐</div>
+                                        <div class="text-sm text-gray-400 mt-1">A/B/C/D款价格和服务期限，参考竞品定价</div>
+                                        <div class="text-xs text-gray-500 mt-2">负责人：商业团队 | 截止：第5天</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="priority-medium bg-yellow-500/5 rounded-xl p-4">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center flex-shrink-0">
+                                        <span class="text-yellow-400 font-bold">3</span>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-white">准备数据授权协议</div>
+                                        <div class="text-sm text-gray-400 mt-1">授权书、删除机制、数据使用边界</div>
+                                        <div class="text-xs text-gray-500 mt-2">负责人：法务团队 | 截止：第7天</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-200 mb-3">关键补强短板</h3>
+                        <div class="space-y-3">
+                            <div class="bg-red-500/10 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-medium text-red-300">品牌认知与用户案例</span>
+                                    <span class="tag tag-risk">高优先级</span>
+                                </div>
+                                <p class="text-sm text-gray-400">产品已成型但品牌知名度低，需快速积累真实用户案例和口碑传播素材</p>
+                            </div>
+                            <div class="bg-orange-500/10 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-medium text-orange-300">数据授权机制</span>
+                                    <span class="tag tag-poor">高优先级</span>
+                                </div>
+                                <p class="text-sm text-gray-400">声音、照片、记忆库都属于高敏感数据，需要完善的授权和保护机制</p>
+                            </div>
+                            <div class="bg-yellow-500/10 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-medium text-yellow-300">用户试用反馈</span>
+                                    <span class="tag tag-normal">中优先级</span>
+                                </div>
+                                <p class="text-sm text-gray-400">找3-5个家庭试用并记录反馈，验证需求是否真成立</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <h3 class="text-lg font-semibold text-gray-200 mb-3">30天推进计划</h3>
+                            <ul class="space-y-2 text-sm text-gray-400">
+                                <li class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    完成产品展示视频和用户案例素材制作
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    完成A/B/C/D款定价策略和价值包装
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    完成数据授权协议和隐私政策文档
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    完成3-5个家庭试用并收集反馈
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    完成供应链评估和生产计划
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="section14" class="glass-card p-8 fade-in">
+                <h2 class="section-header text-2xl font-bold text-white mb-6">十四、沟通话术</h2>
+                
+                <div class="space-y-6">
+                    <div class="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-xl p-6 border border-purple-500/20">
+                        <h3 class="text-lg font-semibold text-white mb-4">投资人汇报话术</h3>
+                        <p class="text-gray-300 leading-relaxed">
+                            "空蓝数据推出了一款实体化AI分身定制产品，通过3D打印模型接入AI技术，支持真人形象复刻及虚拟人物定制（含动漫角色、游戏角色等）。产品可作为亲情陪伴装置，让不在身边的子女以更具存在感的方式参与老人日常生活，同时满足年轻群体对虚拟偶像的实体化情感寄托需求。
+                            <br><br>
+                            当前市场痛点真实——中国有1.2亿空巢老人，情感陪伴赛道竞争相对较少；同时Z世代对虚拟偶像、游戏角色的情感消费快速增长。我们已推出A/B/C/D四款产品，覆盖从基础款到完全定制的不同需求层次。
+                            <br><br>
+                            目前的主要挑战在于品牌建设和用户案例积累，我们计划在3个月内完成品牌包装、用户试用验证和渠道拓展。预计首轮募资目标50万，盈亏平衡点约222件，回收期6个月。
+                            <br><br>
+                            这个项目的核心机会在于老龄化社会带来的刚需，以及虚拟人物定制在年轻群体中的情感消费趋势。"
+                        </p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-blue-500/10 to-green-500/10 rounded-xl p-6 border border-blue-500/20">
+                        <h3 class="text-lg font-semibold text-white mb-4">募资平台文案话术</h3>
+                        <p class="text-gray-300 leading-relaxed">
+                            "把想念，变成看得见摸得着的陪伴。
+                            <br><br>
+                            空蓝数据AI分身定制——支持真人形象复刻，也支持你喜欢的动漫角色、游戏角色实体化。通过3D打印+AI技术，让重要的人或角色，以实体形式陪伴在你身边。
+                            <br><br>
+                            四款产品满足不同需求：A款基础体验，B款定制音色，C款精准上色，D款完全定制。无论是送给父母一份特别的陪伴，还是让自己喜欢的角色走进现实，都能找到合适的选择。
+                            <br><br>
+                            支持我们，让科技承载更多情感与回忆。"
+                        </p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-green-500/10 to-orange-500/10 rounded-xl p-6 border border-green-500/20">
+                        <h3 class="text-lg font-semibold text-white mb-4">合作伙伴沟通话术</h3>
+                        <p class="text-gray-300 leading-relaxed">
+                            "您好，空蓝数据推出了一款AI分身定制产品，通过3D打印模型接入AI技术，支持真人形象复刻及虚拟人物定制（动漫角色、游戏角色等）。目前已推出A/B/C/D四款产品，覆盖亲情陪伴和虚拟偶像两大场景。
+                            <br><br>
+                            我们希望寻找3D打印服务商、AI技术供应商、渠道合作伙伴以及内容创作者。产品已成型，定位清晰，预计首轮募资目标50万。
+                            <br><br>
+                            如果您对银发经济、虚拟偶像、AI硬件或情感消费赛道感兴趣，欢迎一起探讨合作机会。"
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('main > div > div[id^="section"]');
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - 200;
+                    const sectionHeight = section.offsetHeight;
+                    if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+                document.querySelectorAll('.nav-item').forEach(button => {
+                    const onclick = button.getAttribute('onclick');
+                    if (onclick && onclick.includes(current)) {
+                        button.classList.add('active');
+                    }
+                });
+            });
+            
+            const ctx1 = document.getElementById('marketTrendChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: ['2022', '2023', '2024', '2025', '2026E', '2027E'],
+                    datasets: [{
+                        label: '全球AI硬件市场(亿美元)',
+                        data: [280, 380, 520, 680, 800, 980],
+                        borderColor: '#60a5fa',
+                        backgroundColor: 'rgba(96, 165, 250, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af' } },
+                        y: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af' } }
+                    }
+                }
+            });
+            
+            const ctx2 = document.getElementById('categoryShareChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['智能穿戴', '智能家居', 'AI硬件', '机器人', '其他'],
+                    datasets: [{
+                        data: [25, 20, 35, 15, 5],
+                        backgroundColor: ['#60a5fa', '#a78bfa', '#34d399', '#fbbf24', '#9ca3af'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'right', labels: { color: '#9ca3af', padding: 20 } }
+                    }
+                }
+            });
+            
+            const ctx3 = document.getElementById('marketSizingChart').getContext('2d');
+            new Chart(ctx3, {
+                type: 'bar',
+                data: {
+                    labels: ['TAM', 'SAM', 'SOM'],
+                    datasets: [{
+                        label: '市场规模(亿元)',
+                        data: [8000, 2000, 50],
+                        backgroundColor: ['#60a5fa', '#a78bfa', '#34d399'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#9ca3af' } },
+                        y: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af' } }
+                    }
+                }
+            });
+            
+            const ctx4 = document.getElementById('costStructureChart').getContext('2d');
+            new Chart(ctx4, {
+                type: 'doughnut',
+                data: {
+                    labels: ['硬件/BOM', '制造', '营销', '运营'],
+                    datasets: [{
+                        data: [40, 25, 20, 15],
+                        backgroundColor: ['#60a5fa', '#a78bfa', '#fbbf24', '#34d399'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'right', labels: { color: '#9ca3af', padding: 10 } }
+                    }
+                }
+            });
+            
+            const ctx5 = document.getElementById('scoringRadarChart').getContext('2d');
+            new Chart(ctx5, {
+                type: 'radar',
+                data: {
+                    labels: ['痛点强度', '用户清晰度', '竞争壁垒', '可演示性', '技术可行性', '合规信任', '商业模式', '市场推广', '团队匹配', '证据完整'],
+                    datasets: [{
+                        label: '得分',
+                        data: [12, 8, 5, 10, 7, 4, 7, 8, 6, 4],
+                        borderColor: '#60a5fa',
+                        backgroundColor: 'rgba(96, 165, 250, 0.2)',
+                        pointBackgroundColor: '#60a5fa'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255,255,255,0.1)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            pointLabels: { color: '#9ca3af', font: { size: 11 } },
+                            ticks: { display: false },
+                            suggestedMin: 0,
+                            suggestedMax: 15
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+{
+  "agent_info": {
+    "name": "产品可行性分析智能体",
+    "name_en": "Feasibility Analysis Agent",
+    "description": "帮你判断任何产品是否可行的AI分析助手",
+    "description_full": "只需输入项目资料，智能体就能自动完成从品类识别、竞品对比到可行性评分的全流程分析，输出结构化的可行性报告。",
+    "keywords": ["产品可行性", "市场分析", "竞品分析", "智能体", "AI分析", "募资分析"],
+    "category": "生产力工具",
+    "sub_category": "商业分析",
+    "version": "1.0.0",
+    "author": "Feasibility Agent Team",
+    "contact": "feasibility@example.com"
+  },
+  "capabilities": [
+    {
+      "name": "品类识别",
+      "description": "自动判断产品品类：AI硬件、软件工具、消费电子、生活方式、文创设计、游戏娱乐、机器人、智能穿戴、智能家居等"
+    },
+    {
+      "name": "痛点分析",
+      "description": "分析用户核心痛点是否明确、具体、可感知，判断痛点强度"
+    },
+    {
+      "name": "竞品对比",
+      "description": "从案例库中找出最相似的3-5个参照项目，对比关键指标"
+    },
+    {
+      "name": "可行性评分",
+      "description": "10维度加权评分模型，满分100分，给出明确的可行性评级"
+    },
+    {
+      "name": "风险评估",
+      "description": "识别竞争风险、技术风险、履约风险、市场风险、合规风险，提供应对建议"
+    },
+    {
+      "name": "行动建议",
+      "description": "7天验证任务 + 30天推进计划 + 关键短板补强建议"
+    }
+  ],
+  "technical_specs": {
+    "min_context_length": 8192,
+    "recommended_context_length": 16384,
+    "supported_models": ["GPT-4", "GPT-4o", "Claude 3", "Qwen 2", "Spark 4"],
+    "input_format": ["text", "markdown", "url"],
+    "output_format": "markdown",
+    "response_language": "zh-CN",
+    "estimated_response_time": "30-60秒"
+  },
+  "prompt_config": {
+    "main_prompt_path": "../prompts/auto-analysis-agent.md",
+    "critic_prompt_path": "../prompts/critic-agent.md",
+    "case_mining_prompt_path": "../prompts/case-mining-agent.md"
+  },
+  "data_sources": {
+    "case_database": "../tools/case-db/cases.json",
+    "competitor_database": "../tools/data/competitors.json",
+    "scoring_rubric": "../scoring-rubric.md"
+  },
+  "features": {
+    "auto_category_detection": true,
+    "competitor_matching": true,
+    "scoring_system": true,
+    "risk_assessment": true,
+    "actionable_recommendations": true,
+    "crowdfunding_analysis": true,
+    "case_based_reasoning": true,
+    "self_optimization": false
+  }
+}

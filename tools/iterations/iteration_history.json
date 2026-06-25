@@ -1,0 +1,300 @@
+{
+  "description": "智能体迭代历史记录",
+  "created_at": "2026-06-24T18:29:39.625044",
+  "iterations": [
+    {
+      "project_name": "测试项目",
+      "category": "AI硬件",
+      "score": 82,
+      "outcome": "建议推进",
+      "issues": [
+        "竞品分析不够深入"
+      ],
+      "suggestions": [
+        "增加竞品数据库数据"
+      ],
+      "id": 1,
+      "timestamp": "2026-06-24T18:29:39.649315"
+    },
+    {
+      "project_name": "测试项目",
+      "category": "AI硬件",
+      "score": 82,
+      "outcome": "建议推进",
+      "issues": [
+        "竞品分析不够深入"
+      ],
+      "suggestions": [
+        "增加竞品数据库数据"
+      ],
+      "id": 2,
+      "timestamp": "2026-06-24T18:29:53.263419"
+    },
+    {
+      "project_name": "测试项目",
+      "category": "AI硬件",
+      "score": 82,
+      "outcome": "建议推进",
+      "issues": [
+        "竞品分析不够深入"
+      ],
+      "suggestions": [
+        "增加竞品数据库数据"
+      ],
+      "id": 3,
+      "timestamp": "2026-06-24T18:30:51.370889"
+    },
+    {
+      "project_name": "测试项目",
+      "category": "AI硬件",
+      "score": 82,
+      "outcome": "建议推进",
+      "issues": [
+        "竞品分析不够深入"
+      ],
+      "suggestions": [
+        "增加竞品数据库数据"
+      ],
+      "id": 4,
+      "timestamp": "2026-06-24T18:31:58.198576"
+    },
+    {
+      "project_name": "测试项目",
+      "category": "AI硬件",
+      "score": 82,
+      "outcome": "建议推进",
+      "issues": [
+        "竞品分析不够深入"
+      ],
+      "suggestions": [
+        "增加竞品数据库数据"
+      ],
+      "id": 5,
+      "timestamp": "2026-06-24T18:33:13.380837"
+    },
+    {
+      "project_name": "测试项目",
+      "category": "AI硬件",
+      "score": 82,
+      "outcome": "建议推进",
+      "issues": [
+        "竞品分析不够深入"
+      ],
+      "suggestions": [
+        "增加竞品数据库数据"
+      ],
+      "id": 6,
+      "timestamp": "2026-06-24T18:33:54.676361"
+    },
+    {
+      "project_name": "AI智能陪伴机器人",
+      "category": "hardware",
+      "score": 64.8,
+      "outcome": "需要重新定位",
+      "issues": [
+        "证据完整度"
+      ],
+      "suggestions": [
+        "需要补强关键短板"
+      ],
+      "id": 7,
+      "timestamp": "2026-06-24T21:23:47.205878"
+    },
+    {
+      "project_name": "AI智能陪伴机器人",
+      "category": "hardware",
+      "score": 64.8,
+      "outcome": "需要重新定位",
+      "issues": [
+        "证据完整度"
+      ],
+      "suggestions": [
+        "需要补强关键短板"
+      ],
+      "id": 8,
+      "timestamp": "2026-06-25T22:08:41.969795"
+    },
+    {
+      "project_name": "AI智能陪伴机器人",
+      "category": "hardware",
+      "score": 64.8,
+      "outcome": "需要重新定位",
+      "issues": [
+        "证据完整度"
+      ],
+      "suggestions": [
+        "需要补强关键短板"
+      ],
+      "id": 9,
+      "timestamp": "2026-06-25T22:25:16.204461"
+    },
+    {
+      "project_name": "未命名产品",
+      "category": "hardware",
+      "score": 50.0,
+      "outcome": "需要重新定位",
+      "issues": [],
+      "suggestions": [
+        "需要补强关键短板"
+      ],
+      "id": 10,
+      "timestamp": "2026-06-25T22:29:04.877980"
+    },
+    {
+      "project_name": "未命名产品",
+      "category": "hardware",
+      "score": 50.0,
+      "outcome": "需要重新定位",
+      "issues": [],
+      "suggestions": [
+        "需要补强关键短板"
+      ],
+      "id": 11,
+      "timestamp": "2026-06-25T22:30:33.809811"
+    },
+    {
+      "project_name": "未命名产品",
+      "category": "hardware",
+      "score": 50.0,
+      "outcome": "需要重新定位",
+      "issues": [],
+      "suggestions": [
+        "需要补强关键短板"
+      ],
+      "id": 12,
+      "timestamp": "2026-06-25T22:50:25.332401"
+    },
+    {
+      "project_name": "AI智能翻译耳机",
+      "category": "hardware",
+      "score": 53.0,
+      "outcome": "需要重新定位",
+      "issues": [],
+      "suggestions": [
+        "需要补强关键短板"
+      ],
+      "id": 13,
+      "timestamp": "2026-06-25T23:09:52.644996"
+    },
+    {
+      "project_name": "AI智能翻译耳机",
+      "category": "hardware",
+      "score": 53.0,
+      "outcome": "需要重新定位",
+      "issues": [],
+      "suggestions": [
+        "需要补强关键短板"
+      ],
+      "id": 14,
+      "timestamp": "2026-06-25T23:10:48.502899"
+    },
+    {
+      "project_name": "智能客服SaaS",
+      "category": "saas",
+      "score": 56.0,
+      "outcome": "需要重新定位",
+      "issues": [],
+      "suggestions": [
+        "需要补强关键短板"
+      ],
+      "id": 15,
+      "timestamp": "2026-06-25T23:12:34.676804"
+    },
+    {
+      "project_name": "AI智能翻译耳机",
+      "category": "hardware",
+      "score": 53.0,
+      "outcome": "需要重新定位",
+      "issues": [],
+      "suggestions": [
+        "需要补强关键短板"
+      ],
+      "id": 16,
+      "timestamp": "2026-06-25T23:17:25.296738"
+    },
+    {
+      "project_name": "智能客服SaaS",
+      "category": "saas",
+      "score": 56.0,
+      "outcome": "需要重新定位",
+      "issues": [],
+      "suggestions": [
+        "需要补强关键短板"
+      ],
+      "id": 17,
+      "timestamp": "2026-06-25T23:17:35.142267"
+    },
+    {
+      "project_name": "AI商业洞察播客",
+      "category": "saas",
+      "score": 56.0,
+      "outcome": "需要重新定位",
+      "issues": [],
+      "suggestions": [
+        "需要补强关键短板"
+      ],
+      "id": 18,
+      "timestamp": "2026-06-25T23:17:59.742524"
+    },
+    {
+      "project_name": "工厂设备预测维护系统",
+      "category": "b2b",
+      "score": 54.8,
+      "outcome": "需要重新定位",
+      "issues": [],
+      "suggestions": [
+        "需要补强关键短板"
+      ],
+      "id": 19,
+      "timestamp": "2026-06-25T23:18:13.977754"
+    },
+    {
+      "project_name": "AI商业洞察播客",
+      "category": "content",
+      "score": 55.4,
+      "outcome": "需要重新定位",
+      "issues": [],
+      "suggestions": [
+        "需要补强关键短板"
+      ],
+      "id": 20,
+      "timestamp": "2026-06-25T23:19:04.556366"
+    },
+    {
+      "project_name": "AI智能翻译耳机",
+      "category": "hardware",
+      "score": 53.0,
+      "outcome": "需要重新定位",
+      "issues": [],
+      "suggestions": [
+        "需要补强关键短板"
+      ],
+      "id": 21,
+      "timestamp": "2026-06-25T23:25:48.071482"
+    },
+    {
+      "project_name": "AI智能翻译耳机",
+      "category": "hardware",
+      "score": 53.0,
+      "outcome": "需要重新定位",
+      "issues": [],
+      "suggestions": [
+        "需要补强关键短板"
+      ],
+      "id": 22,
+      "timestamp": "2026-06-25T23:26:14.694999"
+    },
+    {
+      "project_name": "AI智能翻译耳机",
+      "category": "hardware",
+      "score": 53.0,
+      "outcome": "需要重新定位",
+      "issues": [],
+      "suggestions": [
+        "需要补强关键短板"
+      ],
+      "id": 23,
+      "timestamp": "2026-06-25T23:38:39.274673"
+    }
+  ]
+}
