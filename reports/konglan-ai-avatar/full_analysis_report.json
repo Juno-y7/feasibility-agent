@@ -1,0 +1,676 @@
+{
+  "meta": {
+    "product_name": "空蓝AI智能分身",
+    "company": "空蓝数据服务（深圳）有限公司",
+    "category": "AI硬件/情感陪伴",
+    "analyzed_at": "2026-06-27",
+    "analyzer": "Feasibility Agent v2.0",
+    "schema_version": "2.0",
+    "analysis_type": "crowdfunding"
+  },
+  "executive_summary": {
+    "crowdfunding_grade": "C",
+    "feasibility_total": 47,
+    "grade_label": "较难成功",
+    "grade_explanation": "产品概念有情感吸引力（让亲情永不缺席），差异化明显（3D打印人像+AI语音克隆+实体陪伴设备，无直接先例），但面临三大致命问题：①核心痛点(空巢老人)与实际购买者(子女)分离导致购买决策链复杂；②功能兑现风险极高（AI对话质量、3D建模还原度、声纹克隆效果均未公开验证）；③嘖嘖平台用户画像（台湾25-40岁文创/科技消费者）与产品目标用户（中国空巢老人/子女）严重不匹配。Jibo(融资$3860万)、Kuri、Sony Aibo等同类陪伴机器人产品均以失败或停售告终，核心原因均为体验落差大+留存率暴跌。强烈建议在解决功能验证和平台匹配问题之前，不要上线募资。",
+    "recommended_platform": "不建议当前上线任何平台",
+    "platform_rationale": "嘖嘖用户(台湾25-40岁文创科技消费者)与产品目标用户(中国空巢老人/子女)严重不匹配；KS/Indiegogo需要海外主体且老人陪伴品类无成功先例；Makuake需要日文本地化；flyingV流量太小。所有平台均不适合当前状态的产品。",
+    "hit_failure_patterns": [
+      "模式1:供应链复杂度被低估",
+      "模式2:交付延迟/项目方失联风险",
+      "模式5:技术可行性存疑"
+    ],
+    "key_weaknesses": [
+      "功能兑现风险极高（AI对话质量未验证）",
+      "购买者与使用者分离（子女买、老人用）",
+      "嘖嘖平台用户画像不匹配",
+      "无任何用户验证数据",
+      "AI持续运营成本可能拖垮财务"
+    ],
+    "one_line_conclusion": "不建议上线募资平台。产品概念有差异化优势，但功能未经验证、平台匹配度极低、购买决策链复杂，需要先完成MVP验证和用户测试后再重新评估。"
+  },
+  "project_profile": {
+    "name": "空蓝AI智能分身",
+    "tagline": "让亲情永不缺席 — 3D打印子女分身+AI语音克隆+实体陪伴设备",
+    "category": "AI硬件/情感陪伴",
+    "subcategory": "老人陪伴",
+    "target_users": {
+      "primary": "子女不在身边的空巢老人（使用者）",
+      "secondary": "为父母购买情感陪伴产品的年轻子女（购买者）",
+      "age_range": "使用者60-85岁，购买者25-50岁"
+    },
+    "core_value": "将子女的形象（3D打印模型）+声音（声纹克隆）+语言习惯（AI学习）数字化复制，生成可随时交互的实体陪伴角色，缓解空巢老人情感孤独",
+    "product_forms": [
+      {
+        "tier": "A款（基础款）",
+        "features": "白模+通用语音",
+        "price": "约¥800-1000"
+      },
+      {
+        "tier": "B款（语音款）",
+        "features": "白模+定制语音克隆",
+        "price": "约¥1000-1200"
+      },
+      {
+        "tier": "C款（上色款）",
+        "features": "上色模型+通用语音",
+        "price": "约¥1200-1500"
+      },
+      {
+        "tier": "D款（完全款）",
+        "features": "上色模型+定制语音克隆",
+        "price": "约¥1500-2000（推测）"
+      }
+    ],
+    "tech_stack": [
+      "3D建模：多视角照片→48小时出模，面部还原度90%+",
+      "声纹克隆：15秒语音样本→复刻本人音色（暂不支持方言）",
+      "AI对话：接入豆包/千问/DeepSeek，响应<0.5秒",
+      "SaaS平台：独立Agent、家庭记忆库、对话策略动态调整"
+    ],
+    "team_background": "清华大学、重庆大学等高校背景，有医疗背景和AI专业背景",
+    "company_founded": "2025年10月（约8个月）",
+    "location": "深圳光明区",
+    "evidence_available": [
+      "展会展品实物",
+      "企业介绍PDF",
+      "产品介绍PDF",
+      "现场演示视频",
+      "公司声称可量产"
+    ]
+  },
+  "market_analysis": {
+    "market_size": {
+      "description": "中国空巢老人超1.3亿，智能陪伴市场规模387亿元（2025年），预计2027年突破1200亿元",
+      "tam": "中国1.3亿空巢老人 × 年均情感陪伴消费¥1000 = ¥1300亿",
+      "sam": "一二线城市空巢老人家庭（约3000万户）× ¥2000 = ¥600亿",
+      "som": "愿意尝试AI陪伴产品的高接受度家庭（约50万户）× ¥2000 = ¥10亿",
+      "source_url": "https://www.statista.com/outlook/emo/tma/robotics/ai-companion-robots/worldwide"
+    },
+    "market_trends": [
+      "AI陪伴机器人市场快速增长（全球CAGR 25.56%，2029年达3043亿元）",
+      "AI数字人核心市场规模突破200亿元（中国2024年），年复合增长率超40%",
+      "国家政策鼓励适老AI服务（2026年4月出台《AI拟人化互动服务管理暂行办法》）",
+      "Looi Robot、ropet等AI陪伴硬件在众筹平台验证了品类可行性"
+    ],
+    "market_risks": [
+      "AI陪伴硬件品类的失败率极高（Jibo融资$3860万倒闭、Sony Aibo停售、Humane AI Pin上市即死）",
+      "购买者与使用者分离：子女付费但老人使用，导致产品体验和付费意愿存在断层",
+      "老人群体技术接受度低，需要极简交互，但AI对话+3D建模的复杂性与此矛盾",
+      "AI陪伴产品新鲜感过后留存率暴跌是行业通病（Anki Vector、所有陪伴类硬件）"
+    ],
+    "market_trends_source": {
+      "source_url": "https://www.iresearch.com.cn/",
+      "note": "数据综合自艾瑞咨询、Statista、募资平台公开数据"
+    },
+    "market_risks_source": {
+      "source_url": "https://www.kickstarter.com/blog/archives",
+      "note": "基于 Kickstarter/Indiegogo 历史项目失败数据"
+    }
+  },
+  "swot_analysis": {
+    "strengths": [
+      {
+        "item": "差异化强：3D打印人像+AI语音克隆的融合形态无直接竞品",
+        "impact": "高",
+        "evidence_strength": "强",
+        "action": "在募资页面突出\"全球首创\"定位，展示实物效果",
+        "source": "Feasibility Agent 分析"
+      },
+      {
+        "item": "情感定位精准：\"让亲情永不缺席\"直击子女愧疚心理",
+        "impact": "高",
+        "evidence_strength": "中",
+        "action": "用真实家庭故事做宣传素材",
+        "source": "Feasibility Agent 分析"
+      },
+      {
+        "item": "四档产品线覆盖不同价位需求",
+        "impact": "中",
+        "evidence_strength": "强",
+        "action": "早鸟价用A款拉量，D款做溢价",
+        "source": "Feasibility Agent 分析"
+      },
+      {
+        "item": "已有实物原型和展会展示",
+        "impact": "中",
+        "evidence_strength": "强",
+        "action": "展会演示视频可作为募资核心素材",
+        "source": "Feasibility Agent 分析"
+      }
+    ],
+    "weaknesses": [
+      {
+        "item": "功能兑现风险极高：AI对话质量、3D还原度、声纹克隆效果均未公开验证",
+        "impact": "极高",
+        "evidence_strength": "中",
+        "action": "上线前必须发布真实产品演示视频，包含AI对话的实际效果",
+        "source": "Feasibility Agent 分析"
+      },
+      {
+        "item": "购买者（子女25-50岁）与使用者（老人60-85岁）分离，购买决策链复杂",
+        "impact": "高",
+        "evidence_strength": "强",
+        "action": "募资文案需同时打动子女（情感诉求）和老人（使用简单）",
+        "source": "Feasibility Agent 分析"
+      },
+      {
+        "item": "成立仅8个月，无量产交付经验",
+        "impact": "高",
+        "evidence_strength": "强",
+        "action": "需有明确的量产计划和BOM成本表",
+        "source": "Feasibility Agent 分析"
+      },
+      {
+        "item": "无任何用户验证数据（无测试用户反馈、无留存数据）",
+        "impact": "高",
+        "evidence_strength": "强",
+        "action": "上线前至少完成10-20个真实家庭测试，收集反馈",
+        "source": "Feasibility Agent 分析"
+      },
+      {
+        "item": "AI持续运营成本未知（云端AI推理、SaaS平台维护）",
+        "impact": "中",
+        "evidence_strength": "中",
+        "action": "需明确说明AI服务的收费模式和可持续性",
+        "source": "Feasibility Agent 分析"
+      }
+    ],
+    "opportunities": [
+      {
+        "item": "品类空白：嘖嘖/KS/Makuake上均无\"3D打印人像+AI陪伴\"的竞品",
+        "impact": "高",
+        "evidence_strength": "强",
+        "action": "抢占有品类先发优势",
+        "source": "Feasibility Agent 分析"
+      },
+      {
+        "item": "AI陪伴硬件已被验证（Looi Robot $64.8万、ropet全球出货万台）",
+        "impact": "中",
+        "evidence_strength": "强",
+        "action": "借鉴成功案例的定价和推广策略",
+        "source": "Feasibility Agent 分析"
+      },
+      {
+        "item": "政策鼓励适老AI服务（2026年4月新规）",
+        "impact": "低",
+        "evidence_strength": "强",
+        "action": "在文案中引用政策支持",
+        "source": "Feasibility Agent 分析"
+      },
+      {
+        "item": "\"AI遗物\"方向社会关注度高（包小柏案例），可借势营销",
+        "impact": "中",
+        "evidence_strength": "中",
+        "action": "注意伦理边界，不要过度消费\"死亡\"话题",
+        "source": "Feasibility Agent 分析"
+      }
+    ],
+    "threats": [
+      {
+        "item": "大厂入局风险：百度曦灵、商汤如影、小冰等已有数字人能力，随时可做实体化",
+        "impact": "高",
+        "evidence_strength": "中",
+        "action": "强调\"个性化定制\"差异化（大厂做标准化，空蓝做定制化）",
+        "source": "Feasibility Agent 分析"
+      },
+      {
+        "item": "伦理合规风险：AI复刻活人/逝者形象涉及肖像权、声音权、数据隐私",
+        "impact": "高",
+        "evidence_strength": "强",
+        "action": "上线前必须完成法律合规审查",
+        "source": "Feasibility Agent 分析"
+      },
+      {
+        "item": "同类产品历史失败率极高（Jibo/Kuri/Aibo/Humane均失败或停售）",
+        "impact": "高",
+        "evidence_strength": "强",
+        "action": "研究失败原因，在文案中主动回应潜在质疑",
+        "source": "Feasibility Agent 分析"
+      }
+    ]
+  },
+  "case_studies": [
+    {
+      "name": "CODE27 Character Livehouse",
+      "platform": "Kickstarter",
+      "amount": "$432,454",
+      "backers": "901",
+      "category": "3D AI陪伴设备",
+      "status": "成功",
+      "relevance": "最相似案例：3D虚拟形象+实体设备+AI互动，单价$429起",
+      "key_lesson": "可定制3D形象+AI互动在KS有市场，但单价较高（$429），需强大的视觉呈现",
+      "url": "https://www.kickstarter.com/projects/code27/character-livehouse",
+      "source_url": "https://www.kickstarter.com/projects/code27/character-livehouse"
+    },
+    {
+      "name": "ElliQ",
+      "platform": "VC融资",
+      "amount": "$8700万+",
+      "backers": "N/A",
+      "category": "老人AI陪伴机器人（台灯形）",
+      "status": "已商业化",
+      "relevance": "最相似场景：老人陪伴AI机器人，已在北美多州政府和医疗组织落地",
+      "key_lesson": "老人陪伴AI需要极高的可靠性（日均互动30次），且需要B端（政府/医疗）渠道，纯C端募资困难",
+      "url": "https://elliq.com/",
+      "source_url": "https://elliq.com/"
+    },
+    {
+      "name": "Jibo",
+      "platform": "VC融资+零售",
+      "amount": "$3860万（VC）",
+      "backers": "N/A",
+      "category": "家庭陪伴机器人",
+      "status": "失败（2019年倒闭，被NTT收购）",
+      "relevance": "同类产品失败案例：\"社交机器人\"概念，融资近$4000万仍失败",
+      "key_lesson": "①定价过高（$899）；②功能未兑现（对话能力极有限）；③市场教育不足；④大模型时代未到来。空蓝需避免同样的陷阱",
+      "url": "https://en.wikipedia.org/wiki/Jibo_(robot)",
+      "source_url": "https://en.wikipedia.org/wiki/Jibo_(robot)"
+    },
+    {
+      "name": "ropet AI宠物",
+      "platform": "Makuake + Kickstarter",
+      "amount": "¥7600万（Makuake）+ $20.2万（KS）",
+      "backers": "4063（Makuake）",
+      "category": "AI桌面宠物机器人",
+      "status": "成功",
+      "relevance": "AI陪伴硬件在募资平台的成功案例，女性用户占70%",
+      "key_lesson": "客单价$129-169（约¥900-1200）是AI陪伴硬件的甜蜜点；萌系设计比人形设计更容易传播",
+      "url": "https://www.makuake.com/project/ropet/",
+      "source_url": "https://www.makuake.com/project/ropet/"
+    },
+    {
+      "name": "Humane AI Pin",
+      "platform": "VC融资+零售",
+      "amount": "$699+月费$24",
+      "backers": "N/A",
+      "category": "AI可穿戴设备",
+      "status": "失败（上市一月考虑出售）",
+      "relevance": "AI硬件功能不兑现的典型案例",
+      "key_lesson": "AI硬件产品如果功能承诺无法兑现，即使有大额融资和媒体报道也会迅速崩塌。空蓝必须在募资前验证AI对话质量",
+      "url": "https://www.humane.com/",
+      "source_url": "https://www.humane.com/"
+    }
+  ],
+  "risk_analysis": {
+    "project_risks": [
+      {
+        "risk": "AI对话质量不可控",
+        "severity": "极高",
+        "probability": "高",
+        "description": "接入豆包/千问/DeepSeek的对话质量是否能满足老人情感陪伴需求？大模型的幻觉、答非所问、缺乏情感理解等问题可能导致用户体验极差",
+        "mitigation": "上线前完成20+真实老人测试，记录对话质量和满意度",
+        "type": "AI对话质量不可控",
+        "level": "极高"
+      },
+      {
+        "risk": "3D建模效果不达预期",
+        "severity": "高",
+        "probability": "中",
+        "description": "面部还原度90%+的承诺在量产中能否实现？不同照片质量、不同脸型的建模效果差异可能很大",
+        "mitigation": "提供多种照片的建模效果对比，设定合理的预期",
+        "type": "3D建模效果不达预期",
+        "level": "高"
+      },
+      {
+        "risk": "供应链交付风险",
+        "severity": "高",
+        "probability": "中",
+        "description": "3D打印+电子底座+AI软件的多组件产品，量产复杂度高",
+        "mitigation": "上线前锁定供应商、完成BOM核算",
+        "type": "供应链交付风险",
+        "level": "高"
+      },
+      {
+        "risk": "伦理合规风险",
+        "severity": "高",
+        "probability": "中",
+        "description": "复刻活人/逝者形象涉及肖像权、声音权、数据隐私。2026年4月新规要求\"人机身份提示\"机制",
+        "mitigation": "上线前完成法律合规审查，获得律师意见书",
+        "type": "伦理合规风险",
+        "level": "高"
+      },
+      {
+        "risk": "AI持续运营成本拖垮财务",
+        "severity": "中",
+        "probability": "高",
+        "description": "每个用户的独立Agent+AI推理+存储的持续成本可能很高，如果采取一次性付费模式可能无法覆盖长期运营成本",
+        "mitigation": "明确AI服务的收费模式（订阅制？一次性付费含服务期？）",
+        "type": "AI持续运营成本拖垮财务",
+        "level": "中"
+      },
+      {
+        "risk": "新鲜感过后留存率暴跌",
+        "severity": "高",
+        "probability": "极高",
+        "description": "行业通病：所有陪伴类硬件（Jibo、Vector、Aibo）都在用户新鲜感过后留存率暴跌。空蓝的产品可能面临同样问题",
+        "mitigation": "设计持续更新的内容机制（节日祝福、记忆更新、动态成长），但需验证有效性",
+        "type": "新鲜感过后留存率暴跌",
+        "level": "高"
+      }
+    ],
+    "failure_patterns_hit": [
+      {
+        "pattern": "模式1:供应链复杂度被低估（频率35%）",
+        "severity": "中高",
+        "signals": [
+          "产品包含3种以上不同类型技术组件（3D打印+电子底座+AI软件+SaaS平台）",
+          "团队无量产经验",
+          "无BOM成本表",
+          "成立仅8个月"
+        ],
+        "case_reference": "Coolest Cooler（$1330万募资，交付灾难）",
+        "prevention": "锁定供应商+详细BOM核算+预留30%缓冲+聘请供应链顾问",
+        "frequency": "频率35%",
+        "relevance": "Coolest Cooler（$1330万募资，交付灾难）"
+      },
+      {
+        "pattern": "模式2:交付延迟/项目方失联（频率25%）",
+        "severity": "中",
+        "signals": [
+          "团队背景偏高校而非产业",
+          "无硬件量产经验",
+          "项目进度更新计划不清晰"
+        ],
+        "case_reference": "摩点多个手办项目逾期不发货",
+        "prevention": "制定详细里程碑+透明退款机制+团队规模匹配复杂度",
+        "frequency": "频率25%",
+        "relevance": "摩点多个手办项目逾期不发货"
+      },
+      {
+        "pattern": "模式5:技术可行性存疑（频率10%）",
+        "severity": "高",
+        "signals": [
+          "3D建模还原度90%+的承诺未公开验证",
+          "声纹克隆效果仅15秒样本的可行性未证实",
+          "AI对话情感理解能力未验证",
+          "\"全球唯一\"声称缺乏第三方背书"
+        ],
+        "case_reference": "Skarp Laser Razor（技术不可行被KS下架）",
+        "prevention": "必须公开产品演示视频+提供多种建模效果对比+完成真实用户测试",
+        "frequency": "频率10%",
+        "relevance": "Skarp Laser Razor（技术不可行被KS下架）"
+      }
+    ]
+  },
+  "feasibility_score": {
+    "total_score": 47,
+    "grade": "C",
+    "grade_label": "较难成功",
+    "dimensions": [
+      {
+        "name": "痛点明确度",
+        "weight": 15,
+        "score": 6,
+        "max_score": 15,
+        "reason": "空巢老人情感缺失是真实痛点（1.3亿空巢老人），但\"子女分身AI陪伴\"是否是最好的解决方案存疑。老人可能更需要的是真实陪伴（电话、视频、回家），而非AI模拟。购买者（子女）的愧疚心理是真实需求，但购买后老人是否使用是未知数。一句话价值传递不够清晰（\"让亲情永不缺席\"很美但不够具体）。"
+      },
+      {
+        "name": "产品可演示性",
+        "weight": 12,
+        "score": 5,
+        "max_score": 12,
+        "reason": "有实物原型和展会展示（正面），但AI对话的实际效果未公开演示（负面）。用户需要看到老人与AI分身互动的真实场景才能理解价值，而非仅看到产品外观。3D打印人像+底座的视觉冲击力一般，不如萌系机器人（ropet/LOOI）有\"哇\"效应。"
+      },
+      {
+        "name": "差异化程度",
+        "weight": 12,
+        "score": 9,
+        "max_score": 12,
+        "reason": "差异化显著：\"3D打印定制人像+AI语音克隆+实体陪伴设备\"的融合形态在募资平台无直接竞品（CODE27是3D虚拟形象但非真人复刻）。但\"全球唯一\"的声称风险较高，缺乏第三方验证。差异化有技术壁垒（3D建模+声纹克隆+AI训练的组合门槛），但纯软件竞品（HeyGen/D-ID/Soul Machines）随时可能入局。"
+      },
+      {
+        "name": "平台匹配度",
+        "weight": 16,
+        "score": 3,
+        "max_score": 16,
+        "reason": "核心扣分项。嘖嘖用户（台湾25-40岁文创/科技消费者）与产品目标用户（中国空巢老人/子女）严重不匹配。嘖嘖平台上无同类成功先例（老人陪伴/AI分身品类空白）。需要台湾公司或代理才能在嘖嘖上线，团队目前无台湾合作方。如果考虑KS，需要海外主体+英文项目页面，且老人陪伴品类在KS无成功先例。"
+      },
+      {
+        "name": "团队/品牌可信度",
+        "weight": 13,
+        "score": 5,
+        "max_score": 13,
+        "reason": "清华/重庆大学背景是加分项（+3），但：成立仅8个月（-2）；核心能力偏学术而非产业（-2）；无硬件量产经验（-2）；无过往交付记录（-2）；\"全球唯一\"的声称可信度存疑（-1）。团队有AI和医疗背景，但缺乏消费电子和募资经验。"
+      },
+      {
+        "name": "供应链就绪度",
+        "weight": 13,
+        "score": 3,
+        "max_score": 13,
+        "reason": "声称可量产但无具体方案（-4）；无BOM成本表（-3）；3D打印+电子底座+AI软件的多组件供应链复杂度高（-2）；成立8个月无量产经验（-2）。如果3D打印是自建产能，产能和良率是未知数。如果外发，需要管理多家供应商。"
+      },
+      {
+        "name": "定价竞争力",
+        "weight": 10,
+        "score": 5,
+        "max_score": 10,
+        "reason": "¥1000元的价格区间与成功案例ropet（¥900-1200）接近，在AI陪伴硬件的合理区间内。但四档定价策略可能导致用户选择困惑。需要确认BOM成本后才能判断毛利空间。如果3D打印定制+AI推理+声纹克隆的综合成本过高，¥1000可能无法覆盖。"
+      },
+      {
+        "name": "社群/预热基础",
+        "weight": 5,
+        "score": 0,
+        "max_score": 5,
+        "reason": "无社交媒体存在、无邮件列表、无社群基础、无KOL关系。展会参展是唯一的曝光渠道。权重已调低（展会项目通常缺失，可后期补），此项不影响总分太多。"
+      },
+      {
+        "name": "冷启动路径",
+        "weight": 3,
+        "score": 0,
+        "max_score": 3,
+        "reason": "无任何外部流量计划。权重已调低（合作方可协助），此项影响最小。"
+      },
+      {
+        "name": "合规与交付风险",
+        "weight": 5,
+        "score": 2,
+        "max_score": 5,
+        "reason": "涉及肖像权（3D打印真人面容）、声音权（声纹克隆）、数据隐私（AI对话记录），合规风险较高。2026年4月新规要求\"人机身份提示\"机制。暂未提及认证计划（蓝牙/WiFi/电池等硬件认证）。交付时间表未提供。"
+      },
+      {
+        "name": "商业可持续性",
+        "weight": 3,
+        "score": 1,
+        "max_score": 3,
+        "reason": "AI持续运营成本（每个用户独立Agent+推理+存储）可能很高。一次性付费模式可能无法覆盖长期成本。是否考虑订阅制？产品线扩展性有限（同一形态迭代）。"
+      },
+      {
+        "name": "情绪价值与身份认同",
+        "weight": 3,
+        "score": 3,
+        "max_score": 3,
+        "reason": "强项。\"让亲情永不缺席\"有情感共鸣力。子女购买是出于对父母的愧疚和爱，不是理性消费。产品有\"情感礼物\"的属性，可以产生社交传播（子女分享\"我给爸妈做了一个AI分身\"）。"
+      }
+    ],
+    "failure_pattern_deductions": [
+      {
+        "pattern": "供应链复杂度被低估",
+        "deduction": -3
+      },
+      {
+        "pattern": "交付延迟/项目方失联",
+        "deduction": -2
+      },
+      {
+        "pattern": "技术可行性存疑",
+        "deduction": -5
+      }
+    ],
+    "deduction_total": -10,
+    "raw_score": 57,
+    "final_score": 47
+  },
+  "crowdfunding": {
+    "platform_comparison": [
+      {
+        "platform": "嘖嘖 zeczec",
+        "match_score": 25,
+        "max_score": 100,
+        "pros": [
+          "中文市场最大募资平台",
+          "消费电子品类有成功案例"
+        ],
+        "cons": [
+          "用户画像不匹配（台湾25-40岁文创消费者 vs 中国空巢老人子女）",
+          "需要台湾公司/代理",
+          "老人陪伴品类无成功先例",
+          "2300万人口市场天花板较低"
+        ],
+        "recommendation": "不推荐"
+      },
+      {
+        "platform": "Kickstarter",
+        "match_score": 15,
+        "max_score": 100,
+        "pros": [
+          "CODE27证明3D+AI陪伴品类在KS有市场",
+          "全球流量最大"
+        ],
+        "cons": [
+          "需要海外主体（中国内地不可直接上线）",
+          "老人陪伴品类无成功先例",
+          "产品需要全面英文本地化",
+          "ElliQ证明老人陪伴赛道需要B端渠道，纯C端困难"
+        ],
+        "recommendation": "不推荐"
+      },
+      {
+        "platform": "Makuake",
+        "match_score": 20,
+        "max_score": 100,
+        "pros": [
+          "日本老龄化严重，老人陪伴需求真实",
+          "ropet证明AI陪伴硬件在日本有市场",
+          "用户消费力极强"
+        ],
+        "cons": [
+          "需要日文本地化",
+          "需要日本本地合作伙伴",
+          "产品未适配日本文化",
+          "审核标准严格"
+        ],
+        "recommendation": "远期考虑，需大量准备"
+      },
+      {
+        "platform": "Indiegogo",
+        "match_score": 20,
+        "max_score": 100,
+        "pros": [
+          "中国内地主体可直接上线",
+          "InDemand模式可持续接单"
+        ],
+        "cons": [
+          "老人陪伴品类无成功先例",
+          "平台流量低于KS"
+        ],
+        "recommendation": "可考虑，但不是首选"
+      },
+      {
+        "platform": "flyingV",
+        "match_score": 10,
+        "max_score": 100,
+        "pros": [
+          "社会创新品类在flyingV有受众"
+        ],
+        "cons": [
+          "流量太小",
+          "不适合硬件产品",
+          "无法覆盖成本"
+        ],
+        "recommendation": "不推荐"
+      }
+    ],
+    "pricing_strategy": {
+      "early_bird": {
+        "tier": "A款（基础款·白模+通用语音）",
+        "price": "¥799",
+        "quota": "100台",
+        "rationale": "最低价拉量，适合尝鲜用户"
+      },
+      "standard": {
+        "tier": "B款（语音款·白模+定制语音）",
+        "price": "¥1099",
+        "rationale": "核心产品，声纹克隆是主要卖点"
+      },
+      "premium": {
+        "tier": "D款（完全款·上色模型+定制语音）",
+        "price": "¥1699",
+        "rationale": "高端溢价，完整体验"
+      },
+      "target_goal": "NT$200万（嘖嘖）/ $30,000（KS）",
+      "estimated_backers": "200-400人"
+    },
+    "supporter_estimation": {
+      "target_platform": "嘖嘖",
+      "target_goal": "NT$200万（约¥45万）",
+      "average_pledge": "¥1200",
+      "required_backers": "375人",
+      "daily_target_first_week": "15人/天（首周）",
+      "daily_target_later": "5人/天（后续）",
+      "feasibility": "困难。嘖嘖老人陪伴品类无先例，冷启动流量几乎为零。需要台湾合作方的社群引流+KOL合作+媒体报道的组合策略"
+    },
+    "delivery_plan": {
+      "estimated_delivery": "上线后6-8个月",
+      "risks": [
+        "3D打印产能和良率",
+        "声纹克隆流程标准化",
+        "AI对话系统稳定性",
+        "物流到台湾的关税和认证"
+      ],
+      "milestones": [
+        "T+0: 募资上线",
+        "T+1月: 锁定供应商",
+        "T+2月: EVT原型完成",
+        "T+4月: DVT试产",
+        "T+5月: 小批量产",
+        "T+6-8月: 开始交付"
+      ]
+    },
+    "promotion_strategy": {
+      "pre_launch": [
+        "联系3-5个台湾KOL/YouTuber做预热",
+        "在PTT/Dcard发布产品讨论帖（测试话题性）",
+        "联系台湾媒体报道（联合报、数位时代等科技媒体）",
+        "建立Line官方账号积累种子用户"
+      ],
+      "during_campaign": [
+        "首日冲刺：KOL同步发文+社群引爆",
+        "每日更新进度：用户测试反馈、建模效果展示",
+        "互动回复：每条留言24小时内回复",
+        "追加福利：定制场景包（生日祝福、节日问候模板）"
+      ],
+      "post_campaign": [
+        "持续在社交媒体更新交付进度",
+        "收集早期用户反馈用于产品迭代",
+        "准备InDemand（Indiegogo）或Makuake日本首发"
+      ]
+    }
+  },
+  "timeline": {
+    "verdict": "建议先完成MVP验证再重新评估募资可行性",
+    "7_day_tasks": [
+      "【关键】完成10-20个真实家庭测试，记录老人使用反馈和留存数据",
+      "【关键】公开AI对话的实际演示视频（非剪辑版，展示真实对话质量）",
+      "【关键】获取法律合规意见书（肖像权、声音权、数据隐私）",
+      "完成BOM成本核算表（3D打印成本+电子BOM+组装+包装+运费）",
+      "联系嘖嘖台湾代理/合作方，了解审核要求和费用结构",
+      "准备3种不同照片质量的建模效果对比（公开预期管理）",
+      "明确AI服务的商业模式（一次性付费 vs 订阅制 vs 两者结合）"
+    ],
+    "key_shortcomings": [
+      "功能兑现风险：AI对话质量未公开验证，是最大的不确定性",
+      "平台匹配度：嘖嘖用户画像与产品目标用户不匹配",
+      "用户验证：无任何真实用户测试数据",
+      "供应链：无量产方案和BOM成本表",
+      "合规：肖像权、声音权、数据隐私的法律风险未排查"
+    ],
+    "30_day_plan": [
+      "Week 1-2: 完成真实家庭测试 + AI对话演示视频 + 法律合规意见书",
+      "Week 2-3: 完成BOM核算 + 量产方案 + 锁定1-2家供应商",
+      "Week 3-4: 联系台湾合作方 + KOL合作 + 媒体沟通 + 募资文案撰写",
+      "Week 4: 如果以上全部完成且结果积极，重新评估募资可行性（预计可提升到B级）"
+    ],
+    "milestone_conditions": "如果在30天内完成以上任务且：①真实家庭测试满意度>=70%；②AI对话演示无重大翻车；③法律合规无阻塞项；④BOM成本确认毛利>=30%，则可进入募资准备阶段，目标平台建议调整为Indiegogo（中国主体可直接上线）+嘖嘖（通过台湾合作方），同时考虑日本Makuake作为远期选项。"
+  }
+}

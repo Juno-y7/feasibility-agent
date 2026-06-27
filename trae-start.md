@@ -13,15 +13,14 @@ D:\Study\AIgoglobal\feasibility-agent
 建议保留这些文件：
 
 - `prompts/direct-use.md`
-- `prompts/main-agent.md`
+- `prompts/main-agent.md`                  # 主提示词（含完整评分模型、品类权重、增长飞轮等结构化数据）
 - `prompts/case-mining-agent.md`
 - `prompts/critic-agent.md`
-- `templates/raw-materials.md`
-- `templates/extracted-intake.md`
-- `templates/report.md`
-- `templates/iteration-log.md`
+- `prompts/crowdfunding-analysis-workflow.md`
+- `report-renderer/index.html`            # HTML 报告渲染器
 - `research/crowdfunding-success-patterns.md`
-- `reports/konglan-ai-avatar/v03-feasibility-with-prototype-and-urls.md`
+- `data/competitors.json`                    # 竞品数据库（17个竞品）
+- `data/benchmark-cases.json`                # 募资案例数据库（33+真实案例，含URL和成功因子）
 
 ## 2. 最简单的用法
 

@@ -1,0 +1,1306 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ai.go.global/feasibility-agent/report-schema.json",
+  "title": "Product Feasibility Analysis Report",
+  "description": "LLM 输出的结构化可行性分析报告 JSON Schema。所有字段非必填，LLM 可能不输出所有章节。additionalProperties 允许，以兼容未来扩展。",
+  "type": "object",
+  "properties": {
+    "meta": {
+      "$ref": "#/definitions/Meta"
+    },
+    "executive_summary": {
+      "$ref": "#/definitions/ExecutiveSummary"
+    },
+    "project_profile": {
+      "$ref": "#/definitions/ProjectProfile"
+    },
+    "market_analysis": {
+      "$ref": "#/definitions/MarketAnalysis"
+    },
+    "pest_analysis": {
+      "$ref": "#/definitions/PESTAnalysis"
+    },
+    "porter_five_forces": {
+      "$ref": "#/definitions/PorterFiveForces"
+    },
+    "swot_analysis": {
+      "$ref": "#/definitions/SWOTAnalysis"
+    },
+    "business_model_canvas": {
+      "$ref": "#/definitions/BusinessModelCanvas"
+    },
+    "case_studies": {
+      "$ref": "#/definitions/CaseStudies"
+    },
+    "market_sizing": {
+      "$ref": "#/definitions/MarketSizing"
+    },
+    "financial_model": {
+      "$ref": "#/definitions/FinancialModel"
+    },
+    "growth_flywheel": {
+      "$ref": "#/definitions/GrowthFlywheel"
+    },
+    "tech_architecture": {
+      "$ref": "#/definitions/TechArchitecture"
+    },
+    "feasibility_score": {
+      "$ref": "#/definitions/FeasibilityScore"
+    },
+    "category_checks": {
+      "$ref": "#/definitions/CategoryChecks"
+    },
+    "timeline": {
+      "$ref": "#/definitions/Timeline"
+    },
+    "exit_strategy": {
+      "$ref": "#/definitions/ExitStrategy"
+    },
+    "risk_analysis": {
+      "$ref": "#/definitions/RiskAnalysis"
+    },
+    "crowdfunding": {
+      "$ref": "#/definitions/Crowdfunding"
+    }
+  },
+  "additionalProperties": true,
+  "required": [],
+  "definitions": {
+    "Meta": {
+      "title": "报告元数据",
+      "description": "报告的基本元信息，包含生成时间、产品名称、品类和分析器等。",
+      "type": "object",
+      "properties": {
+        "generated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "报告生成时间（ISO 8601 格式）"
+        },
+        "product_name": {
+          "type": "string",
+          "description": "被分析的产品/项目名称"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["hardware", "saas", "service", "content", "b2b", "platform", "community", "default"],
+          "description": "识别到的产品品类"
+        },
+        "analyzer": {
+          "type": "string",
+          "description": "执行分析的 LLM 模型名称"
+        },
+        "schema_version": {
+          "type": "string",
+          "description": "报告 schema 版本号"
+        },
+        "analysis_type": {
+          "type": "string",
+          "enum": ["crowdfunding", "general"],
+          "description": "分析类型：crowdfunding=募资可行性分析，general=通用项目可行性"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "ExecutiveSummary": {
+      "title": "执行摘要",
+      "description": "报告的核心结论概览，包含一句话总结、关键指标和主要行动建议。",
+      "type": "object",
+      "properties": {
+        "one_line_summary": {
+          "type": "string",
+          "description": "一句话概括项目可行性结论"
+        },
+        "conclusion": {
+          "type": "string",
+          "description": "核心结论，2-3 句话"
+        },
+        "key_metrics": {
+          "type": "object",
+          "description": "关键指标卡片数据",
+          "properties": {
+            "total_score": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "可行性总分（满分 100）"
+            },
+            "grade": {
+              "type": "string",
+              "enum": ["A", "B", "C", "D", "F"],
+              "description": "可行性等级"
+            },
+            "grade_label": {
+              "type": "string",
+              "description": "等级对应文字说明"
+            },
+            "market_size_tam": {
+              "type": ["string", "number"],
+              "description": "总市场规模（TAM）"
+            },
+            "market_size_sam": {
+              "type": ["string", "number"],
+              "description": "可服务市场规模（SAM）"
+            },
+            "market_size_som": {
+              "type": ["string", "number"],
+              "description": "可获得市场规模（SOM）"
+            },
+            "gross_margin_pct": {
+              "type": ["number", "string"],
+              "description": "预期毛利率百分比"
+            },
+            "payback_months": {
+              "type": ["integer", "string"],
+              "description": "预计回本月数"
+            }
+          },
+          "additionalProperties": true
+        },
+        "top_strengths": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "前三大优势"
+        },
+        "top_risks": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "前三大风险"
+        },
+        "recommendation": {
+          "type": "string",
+          "description": "下一步行动建议"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "ProjectProfile": {
+      "title": "项目画像",
+      "description": "产品的基本定位、目标用户、价值主张和版本规划。",
+      "type": "object",
+      "properties": {
+        "product_description": {
+          "type": "string",
+          "description": "产品描述"
+        },
+        "target_users": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "目标用户群列表"
+        },
+        "value_proposition": {
+          "type": "string",
+          "description": "核心价值主张"
+        },
+        "core_features": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "核心功能列表"
+        },
+        "version_plan": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "version": {
+                "type": "string",
+                "description": "版本号（如 MVP、V2）"
+              },
+              "scope": {
+                "type": "string",
+                "description": "版本范围/包含的功能"
+              },
+              "timeline": {
+                "type": "string",
+                "description": "预计时间线"
+              }
+            },
+            "additionalProperties": true
+          },
+          "description": "版本迭代计划"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "MarketAnalysis": {
+      "title": "市场分析",
+      "description": "市场概况、趋势和细分市场数据。",
+      "type": "object",
+      "properties": {
+        "market_overview": {
+          "type": "string",
+          "description": "市场概述"
+        },
+        "trends": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "trend": {
+                "type": "string",
+                "description": "趋势名称"
+              },
+              "description": {
+                "type": "string",
+                "description": "趋势描述"
+              },
+              "impact": {
+                "type": "string",
+                "enum": ["高", "中", "低", "high", "medium", "low"],
+                "description": "影响程度"
+              }
+            },
+            "additionalProperties": true
+          },
+          "description": "市场趋势列表"
+        },
+        "market_segments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "segment": {
+                "type": "string",
+                "description": "细分市场名称"
+              },
+              "share_pct": {
+                "type": ["number", "string"],
+                "description": "市场份额百分比"
+              },
+              "growth_rate": {
+                "type": ["number", "string"],
+                "description": "增长率"
+              }
+            },
+            "additionalProperties": true
+          },
+          "description": "细分市场列表"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "PESTAnalysis": {
+      "title": "PEST 分析",
+      "description": "政治、经济、社会、技术四个维度的宏观环境分析。",
+      "type": "object",
+      "properties": {
+        "political": {
+          "$ref": "#/definitions/PESTDimension"
+        },
+        "economic": {
+          "$ref": "#/definitions/PESTDimension"
+        },
+        "social": {
+          "$ref": "#/definitions/PESTDimension"
+        },
+        "technological": {
+          "$ref": "#/definitions/PESTDimension"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "PESTDimension": {
+      "title": "PEST 维度",
+      "description": "PEST 分析的单个维度。",
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "维度标签（政治/经济/社会/技术）"
+        },
+        "factors": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "影响因素列表"
+        },
+        "impact": {
+          "type": "string",
+          "enum": ["正面", "负面", "中性", "positive", "negative", "neutral"],
+          "description": "对项目的影响方向"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "PorterFiveForces": {
+      "title": "波特五力分析",
+      "description": "行业竞争力的五力模型分析。",
+      "type": "object",
+      "properties": {
+        "supplier_power": {
+          "$ref": "#/definitions/PorterForce"
+        },
+        "buyer_power": {
+          "$ref": "#/definitions/PorterForce"
+        },
+        "new_entrants": {
+          "$ref": "#/definitions/PorterForce"
+        },
+        "substitutes": {
+          "$ref": "#/definitions/PorterForce"
+        },
+        "industry_rivalry": {
+          "$ref": "#/definitions/PorterForce"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "PorterForce": {
+      "title": "波特五力单项",
+      "description": "波特五力中的单项力量分析。",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "力量名称"
+        },
+        "level": {
+          "type": "string",
+          "enum": ["高", "中", "低", "high", "medium", "low"],
+          "description": "力量强度等级"
+        },
+        "description": {
+          "type": "string",
+          "description": "详细描述"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "SWOTAnalysis": {
+      "title": "SWOT 分析",
+      "description": "优势、劣势、机会、威胁四象限分析，每条标注影响程度和证据。",
+      "type": "object",
+      "properties": {
+        "strengths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SWOTItem"
+          },
+          "description": "优势列表"
+        },
+        "weaknesses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SWOTItem"
+          },
+          "description": "劣势列表"
+        },
+        "opportunities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SWOTItem"
+          },
+          "description": "机会列表"
+        },
+        "threats": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SWOTItem"
+          },
+          "description": "威胁列表"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "SWOTItem": {
+      "title": "SWOT 条目",
+      "description": "SWOT 分析中的单个条目，包含影响程度、证据强度和处理建议。",
+      "type": "object",
+      "properties": {
+        "item": {
+          "type": "string",
+          "description": "条目描述"
+        },
+        "impact": {
+          "type": "string",
+          "enum": ["高", "中", "低", "high", "medium", "low"],
+          "description": "影响程度"
+        },
+        "evidence": {
+          "type": "string",
+          "description": "支持此判断的证据"
+        },
+        "action": {
+          "type": "string",
+          "description": "建议的行动/处理方式"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "BusinessModelCanvas": {
+      "title": "商业模式画布",
+      "description": "基于商业模式画布的九宫格分析。",
+      "type": "object",
+      "properties": {
+        "value_proposition": {
+          "type": "string",
+          "description": "价值主张"
+        },
+        "customer_segments": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "客户细分"
+        },
+        "channels": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "渠道"
+        },
+        "customer_relationships": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "客户关系"
+        },
+        "revenue_streams": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "stream": {
+                "type": "string",
+                "description": "收入来源名称"
+              },
+              "model": {
+                "type": "string",
+                "description": "收费模式（如订阅、一次性、按量）"
+              },
+              "pricing": {
+                "type": ["string", "number"],
+                "description": "定价"
+              }
+            },
+            "additionalProperties": true
+          },
+          "description": "收入来源列表"
+        },
+        "key_resources": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "核心资源"
+        },
+        "key_activities": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "核心活动"
+        },
+        "key_partnerships": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "关键伙伴"
+        },
+        "cost_structure": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "cost": {
+                "type": "string",
+                "description": "成本项名称"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["固定", "可变", "fixed", "variable"],
+                "description": "成本类型"
+              },
+              "estimate": {
+                "type": ["string", "number"],
+                "description": "估算金额"
+              }
+            },
+            "additionalProperties": true
+          },
+          "description": "成本结构列表"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "CaseStudies": {
+      "title": "竞品案例研究",
+      "description": "相关竞品或类似项目的成功/失败案例。",
+      "type": "object",
+      "properties": {
+        "similar_cases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "案例/项目名称"
+              },
+              "platform": {
+                "type": "string",
+                "enum": ["kickstarter", "zeczec", "makuake", "indiegogo", "modian", "flyingv", "other"],
+                "description": "案例所在平台"
+              },
+              "amount": {
+                "type": ["string", "number"],
+                "description": "募资金额或融资额"
+              },
+              "backers": {
+                "type": ["integer", "string"],
+                "description": "支持者/用户数量"
+              },
+              "success_factors": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "成功因素列表"
+              },
+              "relevance": {
+                "type": "string",
+                "description": "与本项目的相似点和可借鉴之处"
+              },
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "description": "案例链接"
+              }
+            },
+            "additionalProperties": true
+          },
+          "description": "类似案例列表"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "MarketSizing": {
+      "title": "市场规模估算",
+      "description": "TAM/SAM/SOM 三层市场规模估算。",
+      "type": "object",
+      "properties": {
+        "tam": {
+          "$ref": "#/definitions/MarketSizeTier"
+        },
+        "sam": {
+          "$ref": "#/definitions/MarketSizeTier"
+        },
+        "som": {
+          "$ref": "#/definitions/MarketSizeTier"
+        },
+        "assumptions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "市场规模估算所依据的假设"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "MarketSizeTier": {
+      "title": "市场规模层级",
+      "description": "单个市场规模层级（TAM/SAM/SOM）的数据。",
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "层级标签"
+        },
+        "value": {
+          "type": ["string", "number"],
+          "description": "市场规模数值"
+        },
+        "description": {
+          "type": "string",
+          "description": "规模估算的说明"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "FinancialModel": {
+      "title": "财务模型",
+      "description": "成本结构、收入模型、盈亏平衡和财务预测。",
+      "type": "object",
+      "properties": {
+        "cost_structure": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "item": {
+                "type": "string",
+                "description": "成本项名称"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["固定", "可变", "fixed", "variable"],
+                "description": "成本类型"
+              },
+              "monthly": {
+                "type": ["number", "string"],
+                "description": "月度成本"
+              },
+              "notes": {
+                "type": "string",
+                "description": "补充说明"
+              }
+            },
+            "additionalProperties": true
+          },
+          "description": "成本结构明细"
+        },
+        "revenue_model": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "item": {
+                "type": "string",
+                "description": "收入来源名称"
+              },
+              "unit_price": {
+                "type": ["number", "string"],
+                "description": "单价"
+              },
+              "monthly_units": {
+                "type": ["integer", "string", "number"],
+                "description": "预计月销量"
+              },
+              "notes": {
+                "type": "string",
+                "description": "补充说明"
+              }
+            },
+            "additionalProperties": true
+          },
+          "description": "收入模型明细"
+        },
+        "break_even": {
+          "type": "object",
+          "properties": {
+            "months": {
+              "type": ["integer", "string"],
+              "description": "预计盈亏平衡月数"
+            },
+            "monthly_revenue_needed": {
+              "type": ["number", "string"],
+              "description": "月收入需达到的金额"
+            },
+            "description": {
+              "type": "string",
+              "description": "盈亏平衡分析说明"
+            }
+          },
+          "additionalProperties": true,
+          "description": "盈亏平衡分析"
+        },
+        "projections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "month": {
+                "type": "string",
+                "description": "时间节点（如 M1、M6、M12）"
+              },
+              "revenue": {
+                "type": ["number", "string"],
+                "description": "预期收入"
+              },
+              "cost": {
+                "type": ["number", "string"],
+                "description": "预期成本"
+              },
+              "profit": {
+                "type": ["number", "string"],
+                "description": "预期利润"
+              }
+            },
+            "additionalProperties": true
+          },
+          "description": "财务预测时间线"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "GrowthFlywheel": {
+      "title": "增长飞轮",
+      "description": "基于 AARRR 模型的增长策略分析。",
+      "type": "object",
+      "properties": {
+        "flywheel_description": {
+          "type": "string",
+          "description": "增长飞轮的整体描述"
+        },
+        "aarrr": {
+          "type": "object",
+          "properties": {
+            "acquisition": {
+              "$ref": "#/definitions/AARRRStage"
+            },
+            "activation": {
+              "$ref": "#/definitions/AARRRStage"
+            },
+            "retention": {
+              "$ref": "#/definitions/AARRRStage"
+            },
+            "revenue": {
+              "$ref": "#/definitions/AARRRStage"
+            },
+            "referral": {
+              "$ref": "#/definitions/AARRRStage"
+            }
+          },
+          "additionalProperties": true,
+          "description": "AARRR 五阶段数据"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "AARRRStage": {
+      "title": "AARRR 阶段",
+      "description": "AARRR 漏斗中的单个阶段数据。",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "阶段名称"
+        },
+        "metrics": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "该阶段关注的关键指标"
+        },
+        "notes": {
+          "type": "string",
+          "description": "阶段说明"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "TechArchitecture": {
+      "title": "技术架构评估",
+      "description": "技术成熟度、复杂度、供应链、安全、扩展性的综合评估。",
+      "type": "object",
+      "properties": {
+        "tech_maturity": {
+          "$ref": "#/definitions/TechDimension"
+        },
+        "tech_complexity": {
+          "$ref": "#/definitions/TechDimension"
+        },
+        "supply_chain": {
+          "$ref": "#/definitions/TechDimension"
+        },
+        "security": {
+          "$ref": "#/definitions/TechDimension"
+        },
+        "scalability": {
+          "$ref": "#/definitions/TechDimension"
+        },
+        "risk_level": {
+          "type": "string",
+          "enum": ["高", "中", "低", "high", "medium", "low"],
+          "description": "整体技术风险等级"
+        },
+        "notes": {
+          "type": "string",
+          "description": "补充说明"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "TechDimension": {
+      "title": "技术维度评估",
+      "description": "技术架构评估中的单个维度。",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "维度名称"
+        },
+        "level": {
+          "type": "string",
+          "enum": ["高", "中", "低", "high", "medium", "low"],
+          "description": "评估等级"
+        },
+        "notes": {
+          "type": "string",
+          "description": "评估说明"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "FeasibilityScore": {
+      "title": "可行性评分",
+      "description": "基于 12 个维度的加权评分模型（募资可行性），满分 100 分。附加通用评分可选。",
+      "type": "object",
+      "properties": {
+        "category_weights": {
+          "type": "string",
+          "enum": ["hardware", "saas", "service", "content", "b2b", "platform", "default"],
+          "description": "使用的品类权重模板"
+        },
+        "dimensions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "维度名称"
+              },
+              "weight": {
+                "type": ["integer", "number"],
+                "description": "维度权重"
+              },
+              "score": {
+                "type": ["integer", "number"],
+                "description": "实际得分"
+              },
+              "max": {
+                "type": ["integer", "number"],
+                "description": "该维度满分"
+              },
+              "notes": {
+                "type": "string",
+                "description": "评分理由"
+              }
+            },
+            "additionalProperties": true
+          },
+          "description": "评分维度列表（主评分 12 维度或附加通用评分维度）",
+        },
+        "total_score": {
+          "type": ["integer", "number"],
+          "minimum": 0,
+          "maximum": 100,
+          "description": "可行性总分"
+        },
+        "grade": {
+          "type": "string",
+          "enum": ["A", "B", "C", "D", "F"],
+          "description": "可行性等级"
+        },
+        "grade_label": {
+          "type": "string",
+          "description": "等级文字说明"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "CategoryChecks": {
+      "title": "品类特别检查",
+      "description": "根据识别到的品类进行的专项检查清单。",
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": ["hardware", "saas", "service", "content", "b2b", "platform", "community", "default"],
+          "description": "当前检查的品类"
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "item": {
+                "type": "string",
+                "description": "检查项名称"
+              },
+              "status": {
+                "type": "string",
+                "enum": ["pass", "fail", "warn", "通过", "不通过", "警告"],
+                "description": "检查结果状态"
+              },
+              "notes": {
+                "type": "string",
+                "description": "检查说明"
+              }
+            },
+            "additionalProperties": true
+          },
+          "description": "检查项列表"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "Timeline": {
+      "title": "时间规划",
+      "description": "从验证期到规模化期的分阶段时间线规划。",
+      "type": "object",
+      "properties": {
+        "phases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "phase": {
+                "type": "string",
+                "description": "阶段名称（如验证期、开发期、MVP 等）"
+              },
+              "period": {
+                "type": "string",
+                "description": "时间区间（如 0-3个月）"
+              },
+              "goal": {
+                "type": "string",
+                "description": "阶段目标"
+              },
+              "tasks": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "该阶段的关键任务"
+              },
+              "success_criteria": {
+                "type": "string",
+                "description": "成功标准"
+              }
+            },
+            "additionalProperties": true
+          },
+          "description": "阶段列表"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "ExitStrategy": {
+      "title": "退出策略与止损",
+      "description": "退出路径选项和止损触发条件。",
+      "type": "object",
+      "properties": {
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "option": {
+                "type": "string",
+                "description": "退出方式（如被收购、IPO、独立运营）"
+              },
+              "condition": {
+                "type": "string",
+                "description": "适用条件"
+              },
+              "return": {
+                "type": "string",
+                "description": "预期回报"
+              },
+              "risk": {
+                "type": "string",
+                "description": "相关风险"
+              }
+            },
+            "additionalProperties": true
+          },
+          "description": "退出选项列表"
+        },
+        "stop_loss_triggers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "止损类型（如财务止损、用户止损）"
+              },
+              "indicator": {
+                "type": "string",
+                "description": "监控指标"
+              },
+              "threshold": {
+                "type": "string",
+                "description": "触发阈值"
+              },
+              "action": {
+                "type": "string",
+                "description": "触发后的应对措施"
+              }
+            },
+            "additionalProperties": true
+          },
+          "description": "止损触发条件列表"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "RiskAnalysis": {
+      "title": "风险与失败模式分析",
+      "description": "项目风险清单和行业常见失败模式分析。",
+      "type": "object",
+      "properties": {
+        "project_risks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "风险类型（如竞争风险、技术风险、合规风险）"
+              },
+              "description": {
+                "type": "string",
+                "description": "风险描述"
+              },
+              "level": {
+                "type": "string",
+                "enum": ["高", "中", "低", "high", "medium", "low"],
+                "description": "风险等级"
+              },
+              "mitigation": {
+                "type": "string",
+                "description": "应对/缓解措施"
+              }
+            },
+            "additionalProperties": true
+          },
+          "description": "项目风险列表"
+        },
+        "failure_patterns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "pattern": {
+                "type": "string",
+                "description": "失败模式名称"
+              },
+              "frequency": {
+                "type": ["string", "number"],
+                "description": "行业发生频率"
+              },
+              "prevention": {
+                "type": "string",
+                "description": "预防措施"
+              },
+              "relevance": {
+                "type": "string",
+                "description": "与本项目的关联程度"
+              }
+            },
+            "additionalProperties": true
+          },
+          "description": "行业失败模式列表"
+        }
+      },
+      "additionalProperties": true
+    },
+
+    "Crowdfunding": {
+      "title": "募资可行性评估",
+      "description": "针对 Kickstarter/嘖嘖/Makuake 等募资平台的专项评估。",
+      "type": "object",
+      "properties": {
+        "recommended_platform": {
+          "type": "string",
+          "enum": ["kickstarter", "zeczec", "makuake", "indiegogo", "modian", "flyingv"],
+          "description": "推荐平台"
+        },
+        "platform_comparison": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "platform": {
+                "type": "string",
+                "description": "平台名称"
+              },
+              "match_score": {
+                "type": ["integer", "number"],
+                "minimum": 0,
+                "maximum": 100,
+                "description": "平台匹配分数"
+              },
+              "pros": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "平台优势"
+              },
+              "cons": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "平台劣势"
+              },
+              "fee": {
+                "type": "string",
+                "description": "平台手续费"
+              },
+              "success_rate": {
+                "type": ["string", "number"],
+                "description": "平台成功率"
+              }
+            },
+            "additionalProperties": true
+          },
+          "description": "平台对比列表"
+        },
+        "crowdfunding_score": {
+          "type": "object",
+          "properties": {
+            "dimensions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "评分维度名称"
+                  },
+                  "weight": {
+                    "type": ["integer", "number"],
+                    "description": "维度权重"
+                  },
+                  "score": {
+                    "type": ["integer", "number"],
+                    "description": "实际得分"
+                  },
+                  "max": {
+                    "type": ["integer", "number"],
+                    "description": "该维度满分"
+                  }
+                },
+                "additionalProperties": true
+              },
+              "description": "募资评分维度列表"
+            },
+            "total_score": {
+              "type": ["integer", "number"],
+              "minimum": 0,
+              "description": "募资可行性总分"
+            },
+            "grade": {
+              "type": "string",
+              "enum": ["A", "B", "C", "D", "F"],
+              "description": "募资可行性等级"
+            },
+            "grade_label": {
+              "type": "string",
+              "description": "等级文字说明"
+            }
+          },
+          "additionalProperties": true,
+          "description": "募资可行性评分"
+        },
+        "pricing_strategy": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tier": {
+                "type": "string",
+                "description": "档位名称（如早鸟版、标准版）"
+              },
+              "price": {
+                "type": ["number", "string"],
+                "description": "价格"
+              },
+              "limit": {
+                "type": ["integer", "string", "number"],
+                "description": "限量数量"
+              },
+              "description": {
+                "type": "string",
+                "description": "档位说明"
+              }
+            },
+            "additionalProperties": true
+          },
+          "description": "定价策略档位列表"
+        },
+        "supporter_estimates": {
+          "type": "object",
+          "properties": {
+            "target_amount": {
+              "type": ["number", "string"],
+              "description": "目标募资金额"
+            },
+            "avg_pledge": {
+              "type": ["number", "string"],
+              "description": "平均支持金额"
+            },
+            "needed_supporters": {
+              "type": ["integer", "string", "number"],
+              "description": "需要支持者数量"
+            },
+            "daily_target": {
+              "type": ["integer", "string", "number"],
+              "description": "每日目标支持人数"
+            },
+            "campaign_days": {
+              "type": ["integer", "string", "number"],
+              "description": "活动天数"
+            }
+          },
+          "additionalProperties": true,
+          "description": "支持者估算"
+        },
+        "delivery_plan": {
+          "type": "object",
+          "properties": {
+            "estimated_delivery": {
+              "type": "string",
+              "description": "预计交付时间"
+            },
+            "milestones": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "milestone": {
+                    "type": "string",
+                    "description": "里程碑名称"
+                  },
+                  "date": {
+                    "type": "string",
+                    "description": "时间节点（如 M1、M3）"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["待定", "进行中", "已完成", "pending", "in_progress", "completed"],
+                    "description": "里程碑状态"
+                  }
+                },
+                "additionalProperties": true
+              },
+              "description": "交付里程碑列表"
+            }
+          },
+          "additionalProperties": true,
+          "description": "交付计划"
+        },
+        "promotion_strategy": {
+          "type": "object",
+          "properties": {
+            "pre_launch": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "预热期推广策略"
+            },
+            "during_campaign": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "活动中推广策略"
+            },
+            "final_push": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "最后冲刺推广策略"
+            }
+          },
+          "additionalProperties": true,
+          "description": "推广策略"
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

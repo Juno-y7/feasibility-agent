@@ -1,0 +1,2215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品可行性分析报告渲染器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            color: #e4e4e7;
+            margin: 0;
+        }
+        .glass-card {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 16px;
+        }
+        .glass-card-sm {
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        /* Sidebar */
+        #sidebar {
+            position: fixed;
+            left: 0; top: 0; bottom: 0;
+            width: 280px;
+            background: rgba(15,12,41,0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            overflow-y: auto;
+            z-index: 100;
+            padding: 20px 0;
+            transition: transform 0.3s ease;
+        }
+        #sidebar.hidden { transform: translateX(-280px); }
+        .nav-group-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.35);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 12px 20px 6px;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px 8px 28px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border-left: 3px solid transparent;
+        }
+        .nav-item:hover {
+            background: rgba(96,165,250,0.1);
+            color: #e4e4e7;
+            border-left-color: rgba(96,165,250,0.4);
+        }
+        .nav-item.active {
+            background: rgba(96,165,250,0.15);
+            color: #60a5fa;
+            border-left-color: #60a5fa;
+        }
+        .nav-item .num {
+            font-size: 10px;
+            opacity: 0.5;
+            width: 18px;
+            text-align: center;
+        }
+        /* Main */
+        #main-wrap {
+            margin-left: 280px;
+            transition: margin-left 0.3s ease;
+        }
+        #main-wrap.full { margin-left: 0; }
+        /* Tags */
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .tag-excellent { background: rgba(34,197,94,0.2); color: #4ade80; }
+        .tag-good { background: rgba(96,165,250,0.2); color: #93c5fd; }
+        .tag-normal { background: rgba(251,191,36,0.2); color: #fcd34d; }
+        .tag-poor { background: rgba(249,115,22,0.2); color: #fdba74; }
+        .tag-risk { background: rgba(239,68,68,0.2); color: #fca5a5; }
+        /* Section underline */
+        .section-title {
+            position: relative;
+            display: inline-block;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -6px; left: 0;
+            width: 50px; height: 3px;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            border-radius: 2px;
+        }
+        /* Grade badges */
+        .grade-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            font-size: 28px;
+            font-weight: 700;
+            border: 3px solid;
+        }
+        .grade-S { border-color: #4ade80; color: #4ade80; background: rgba(34,197,94,0.1); }
+        .grade-A { border-color: #60a5fa; color: #60a5fa; background: rgba(96,165,250,0.1); }
+        .grade-B { border-color: #a78bfa; color: #a78bfa; background: rgba(167,139,250,0.1); }
+        .grade-C { border-color: #fcd34d; color: #fcd34d; background: rgba(251,191,36,0.1); }
+        .grade-D { border-color: #fb923c; color: #fb923c; background: rgba(249,115,22,0.1); }
+        .grade-F { border-color: #f87171; color: #f87171; background: rgba(239,68,68,0.1); }
+        /* Table */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .data-table th {
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .data-table td {
+            padding: 10px 14px;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.8);
+        }
+        .data-table tr:hover td { background: rgba(255,255,255,0.03); }
+        /* SWOT quadrant */
+        .swot-quadrant {
+            padding: 20px;
+            border-radius: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+        .swot-S { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); }
+        .swot-W { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); }
+        .swot-O { background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.2); }
+        .swot-T { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); }
+        /* Canvas grid */
+        .canvas-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: auto auto auto;
+            gap: 10px;
+        }
+        .canvas-cell {
+            padding: 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        .canvas-cell .cell-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #a78bfa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        /* Timeline */
+        .timeline-item {
+            position: relative;
+            padding-left: 36px;
+            padding-bottom: 24px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 12px; top: 28px; bottom: 0;
+            width: 2px;
+            background: rgba(255,255,255,0.15);
+        }
+        .timeline-item:last-child::before { display: none; }
+        .timeline-item .dot {
+            position: absolute;
+            left: 4px; top: 8px;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            border: 2px solid #24243e;
+        }
+        /* Five forces diamond */
+        .force-item {
+            text-align: center;
+            padding: 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+        }
+        /* Input area */
+        #json-input {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #e4e4e7;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            resize: vertical;
+            border-radius: 12px;
+            padding: 16px;
+            width: 100%;
+        }
+        #json-input:focus {
+            outline: none;
+            border-color: rgba(96,165,250,0.5);
+            box-shadow: 0 0 0 3px rgba(96,165,250,0.15);
+        }
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            color: #fff;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-secondary {
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.8);
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.15);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.15); }
+        /* No data */
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            color: rgba(255,255,255,0.35);
+            font-size: 14px;
+        }
+        /* Cover */
+        .cover-section {
+            text-align: center;
+            padding: 80px 40px;
+        }
+        .cover-section h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .cover-section .grade-big {
+            font-size: 5rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+        /* Check status */
+        .check-pass { color: #4ade80; font-weight: bold; }
+        .check-fail { color: #f87171; font-weight: bold; }
+        .check-warn { color: #fcd34d; font-weight: bold; }
+        /* Print */
+        @media print {
+            body { background: #fff !important; color: #1a1a1a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            #sidebar, #input-area, #export-bar, #toggle-sidebar, .no-print { display: none !important; }
+            #main-wrap { margin-left: 0 !important; }
+            .glass-card, .glass-card-sm { background: #f8f9fa !important; border-color: #dee2e6 !important; backdrop-filter: none !important; }
+            .gradient-text { -webkit-text-fill-color: #4f46e5 !important; }
+            .data-table th { background: #e9ecef !important; color: #495057 !important; }
+            .data-table td { color: #343a40 !important; border-color: #dee2e6 !important; }
+            .section-title { color: #1a1a1a !important; }
+            .cover-section h1 { color: #1a1a1a !important; }
+            .swot-quadrant, .force-item, .canvas-cell { background: #f1f3f5 !important; border-color: #dee2e6 !important; }
+            .swot-quadrant .cell-title, .canvas-cell .cell-title { color: #6f42c1 !important; }
+            canvas { max-width: 100% !important; }
+        }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+        /* Responsive */
+        @media (max-width: 768px) {
+            #sidebar { transform: translateX(-280px); }
+            #sidebar.show { transform: translateX(0); }
+            #main-wrap { margin-left: 0 !important; }
+            .canvas-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <nav id="sidebar">
+        <div style="padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 10px;">
+            <div class="gradient-text" style="font-size: 15px; font-weight: 700;">可行性分析报告</div>
+            <div style="font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px;">Feasibility Report Renderer</div>
+        </div>
+        <div id="nav-items"></div>
+    </nav>
+
+    <!-- Toggle sidebar button (mobile) -->
+    <button id="toggle-sidebar" class="btn-secondary no-print" onclick="toggleSidebar()" style="position:fixed;top:12px;left:12px;z-index:200;font-size:18px;padding:6px 10px;">&#9776;</button>
+
+    <!-- Main Content -->
+    <div id="main-wrap">
+        <!-- Input Area -->
+        <div id="input-area" class="no-print" style="padding: 24px;">
+            <div class="glass-card" style="padding: 24px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+                    <div>
+                        <h2 style="font-size:18px;font-weight:700;color:#e4e4e7;">JSON 数据输入</h2>
+                        <p style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:2px;">粘贴 LLM 输出的结构化 JSON，点击渲染生成报告</p>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <button class="btn-primary" onclick="renderReport()">渲染报告</button>
+                        <button class="btn-secondary" onclick="loadSample()">加载示例</button>
+                        <button class="btn-secondary" onclick="document.getElementById('json-input').value='';clearReport();">清空</button>
+                    </div>
+                </div>
+                <textarea id="json-input" rows="10" placeholder='在此粘贴 JSON 数据...\n\n格式参考设计文档第4节的 JSON Schema'></textarea>
+                <div id="parse-status" style="margin-top:8px;font-size:12px;color:rgba(255,255,255,0.45);"></div>
+            </div>
+        </div>
+
+        <!-- Export Bar -->
+        <div id="export-bar" class="no-print" style="display:none;padding: 0 24px 16px;">
+            <div class="glass-card-sm" style="padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+                <span style="font-size:13px;color:rgba(255,255,255,0.6);">报告已生成，你可以：</span>
+                <div style="display:flex;gap:8px;">
+                    <button class="btn-secondary" onclick="downloadHTML()">下载 HTML</button>
+                    <button class="btn-secondary" onclick="downloadMarkdown()">下载 Markdown</button>
+                    <button class="btn-primary" onclick="window.print()" style="padding:8px 16px;font-size:13px;">导出 PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Preview -->
+        <div id="report" style="padding: 0 24px 60px; max-width: 960px; margin: 0 auto;">
+            <div class="no-data" style="padding: 100px 40px;">
+                <div style="font-size:48px;opacity:0.15;margin-bottom:16px;">&#128202;</div>
+                <div style="font-size:16px;">尚未生成报告</div>
+                <div style="font-size:13px;margin-top:4px;">粘贴 JSON 数据并点击"渲染报告"开始</div>
+            </div>
+        </div>
+    </div>
+
+<script>
+// ============================================================
+// Global state
+// ============================================================
+let currentData = null;
+let chartInstances = [];
+
+// ============================================================
+// Navigation
+// ============================================================
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('show');
+}
+
+// Active nav on scroll
+function updateActiveNav() {
+    const sections = document.querySelectorAll('[id^="sec-"], [id="cover"]');
+    let activeId = '';
+    sections.forEach(sec => {
+        const rect = sec.getBoundingClientRect();
+        if (rect.top <= 120) activeId = sec.id;
+    });
+    document.querySelectorAll('#sidebar .nav-item').forEach(item => {
+        item.classList.toggle('active', item.getAttribute('data-target') === activeId);
+    });
+}
+window.addEventListener('scroll', updateActiveNav, { passive: true });
+
+// ============================================================
+// Helpers
+// ============================================================
+function safeGet(obj, path, fallback = '') {
+    const keys = path.split('.');
+    let cur = obj;
+    for (const k of keys) {
+        if (cur && typeof cur === 'object' && k in cur) { cur = cur[k]; }
+        else return fallback;
+    }
+    return cur ?? fallback;
+}
+
+function noDataHTML() {
+    return '<div class="glass-card-sm" style="padding:24px;text-align:center;margin-top:20px;"><div style="font-size:13px;color:rgba(255,255,255,0.4);">此章节暂无数据</div><div style="font-size:11px;color:rgba(255,255,255,0.25);margin-top:4px;">JSON 中未提供该部分内容</div></div>';
+}
+
+function impactTag(level) {
+    const map = { '高': 'tag-risk', '中': 'tag-normal', '低': 'tag-good' };
+    return `<span class="tag ${map[level] || 'tag-normal'}">${level || '--'}</span>`;
+}
+
+function levelTag(level) {
+    const map = { '高': 'tag-risk', '中': 'tag-normal', '低': 'tag-good' };
+    return `<span class="tag ${map[level] || 'tag-normal'}">${level || '--'}</span>`;
+}
+
+function checkStatusIcon(status) {
+    const map = { 'pass': ['check-pass','&#10003;'], 'fail': ['check-fail','&#10007;'], 'warn': ['check-warn','&#9888;'] };
+    const [cls, icon] = map[status] || ['check-warn','?'];
+    return `<span class="${cls}" style="font-size:18px;">${icon}</span>`;
+}
+
+function gradeClass(g) {
+    const g2 = (g || '').toUpperCase();
+    if (g2 === 'S') return 'grade-S';
+    if (g2 === 'A') return 'grade-A';
+    if (g2 === 'B') return 'grade-B';
+    if (g2 === 'C') return 'grade-C';
+    if (g2 === 'D') return 'grade-D';
+    return 'grade-F';
+}
+
+function destroyCharts() {
+    chartInstances.forEach(c => { try { c.destroy(); } catch(e){} });
+    chartInstances = [];
+}
+
+// ============================================================
+// Section renderers
+// ============================================================
+
+function renderCover(d) {
+    const meta = d.meta || {};
+    const es = d.executive_summary || {};
+    const km = es.key_metrics || {};
+    // 支持两种格式：众筹格式(crowdfunding_grade/feasibility_total) 和通用格式(key_metrics)
+    const isCrowdfunding = !!(es.crowdfunding_grade || (meta.analysis_type === 'crowdfunding'));
+    const grade = isCrowdfunding ? (es.crowdfunding_grade || '?') : (km.grade || '?');
+    const gradeLabel = isCrowdfunding ? (es.grade_label || '') : (km.grade_label || es.recommendation || '');
+    const totalScore = isCrowdfunding ? (es.feasibility_total || 0) : (km.total_score || 0);
+    const conclusion = isCrowdfunding ? (es.grade_explanation || es.one_line_conclusion || '') : (km.conclusion || es.conclusion || '');
+    const date = (meta.generated_at || meta.analyzed_at) ? new Date(meta.generated_at || meta.analyzed_at).toLocaleDateString('zh-CN', {year:'numeric',month:'long',day:'numeric'}) : '';
+    const category = meta.category || '';
+    const catLabels = {hardware:'硬件/消费品',saas:'SaaS/效率工具',service:'服务/咨询',content:'内容/社群',b2b:'B2B/企业级',platform:'平台/双边市场',community:'社群/平台'};
+    const catLabel = catLabels[category] || category || '通用';
+
+    return `
+    <div id="cover" class="cover-section">
+        <div style="font-size:12px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:2px;margin-bottom:24px;">产品可行性分析报告</div>
+        <h1 class="gradient-text">${meta.product_name || '未命名产品'}</h1>
+        <div style="margin:8px 0 24px;"><span class="tag tag-good" style="font-size:13px;">${catLabel}</span></div>
+        <div class="grade-big gradient-text">${grade}</div>
+        <div style="font-size:16px;color:rgba(255,255,255,0.6);margin:8px 0 32px;">${gradeLabel}</div>
+        ${totalScore ? `
+        <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:32px;">
+            <div class="glass-card-sm" style="padding:16px 24px;text-align:center;min-width:120px;">
+                <div style="font-size:11px;color:rgba(255,255,255,0.4);">总分</div>
+                <div style="font-size:24px;font-weight:700;color:#60a5fa;">${totalScore}<span style="font-size:12px;color:rgba(255,255,255,0.35);">/100</span></div>
+            </div>
+            ${!isCrowdfunding && km.market_size_tam ? `<div class="glass-card-sm" style="padding:16px 24px;text-align:center;min-width:120px;">
+                <div style="font-size:11px;color:rgba(255,255,255,0.4);">TAM</div>
+                <div style="font-size:24px;font-weight:700;color:#a78bfa;">${km.market_size_tam}</div>
+            </div>` : ''}
+            ${!isCrowdfunding && km.gross_margin_pct ? `<div class="glass-card-sm" style="padding:16px 24px;text-align:center;min-width:120px;">
+                <div style="font-size:11px;color:rgba(255,255,255,0.4);">毛利率</div>
+                <div style="font-size:24px;font-weight:700;color:#4ade80;">${km.gross_margin_pct}%</div>
+            </div>` : ''}
+        </div>` : ''}
+        ${conclusion ? `<div style="font-size:13px;color:rgba(255,255,255,0.5);max-width:640px;margin:0 auto 24px;line-height:1.6;">${conclusion}</div>` : ''}
+        <div style="font-size:13px;color:rgba(255,255,255,0.3);">${date}</div>
+        <div style="margin-top:32px;font-size:11px;color:rgba(255,255,255,0.2);max-width:600px;margin-left:auto;margin-right:auto;line-height:1.6;">
+            免责声明：本报告由 AI 辅助生成，仅供决策参考，不构成投资建议。所有分析基于公开信息和假设，实际情况可能存在差异。请在正式决策前进行独立验证。
+        </div>
+    </div>`;
+}
+
+function renderExecutiveSummary(d) {
+    const es = d.executive_summary;
+    if (!es) return noDataHTML();
+    const isCrowdfunding = !!(es.crowdfunding_grade || (d.meta && d.meta.analysis_type === 'crowdfunding'));
+    const km = es.key_metrics || {};
+
+    if (isCrowdfunding) {
+        // 众筹格式
+        let failureHTML = '';
+        if (es.hit_failure_patterns && es.hit_failure_patterns.length) {
+            failureHTML = `<div style="margin-top:16px;"><div style="font-size:13px;font-weight:600;color:#f87171;margin-bottom:8px;">命中失败模式</div>` +
+                es.hit_failure_patterns.map(f => `<div style="font-size:13px;color:rgba(255,255,255,0.7);padding:4px 0;padding-left:16px;border-left:2px solid rgba(239,68,68,0.3);margin-bottom:6px;">${f}</div>`).join('') +
+                `</div>`;
+        }
+        let weaknessesHTML = '';
+        if (es.key_weaknesses && es.key_weaknesses.length) {
+            weaknessesHTML = `<div style="margin-top:16px;"><div style="font-size:13px;font-weight:600;color:#fbbf24;margin-bottom:8px;">关键弱点</div>` +
+                es.key_weaknesses.map(w => `<div style="font-size:13px;color:rgba(255,255,255,0.7);padding:4px 0;padding-left:16px;border-left:2px solid rgba(251,191,36,0.3);margin-bottom:6px;">${w}</div>`).join('') +
+                `</div>`;
+        }
+        return `
+        <div id="sec-executive_summary" style="margin-top:48px;">
+            <h3 class="section-title gradient-text">执行摘要</h3>
+            <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">对项目可行性的最高层概括，包括核心结论、关键指标和下一步行动建议。</p>
+            ${es.one_line_conclusion ? `<div class="glass-card-sm" style="padding:16px;margin-bottom:16px;"><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px;">一句话概括</div><div style="font-size:15px;font-weight:600;">${es.one_line_conclusion}</div></div>` : ''}
+            ${es.grade_explanation ? `<p style="font-size:14px;color:rgba(255,255,255,0.75);line-height:1.8;margin-bottom:16px;">${es.grade_explanation}</p>` : ''}
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px;">
+                ${es.crowdfunding_grade ? `<div class="glass-card-sm" style="padding:14px;text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">评级</div><div class="grade-badge ${gradeClass(es.crowdfunding_grade)}" style="width:44px;height:44px;font-size:20px;margin:4px auto;">${es.crowdfunding_grade}</div><div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;">${es.grade_label||''}</div></div>` : ''}
+                ${es.feasibility_total ? `<div class="glass-card-sm" style="padding:14px;text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">总分</div><div style="font-size:22px;font-weight:700;color:#60a5fa;">${es.feasibility_total}</div></div>` : ''}
+                ${es.recommended_platform ? `<div class="glass-card-sm" style="padding:14px;text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">建议平台</div><div style="font-size:14px;font-weight:600;">${es.recommended_platform}</div></div>` : ''}
+            </div>
+            ${es.platform_rationale ? `<div class="glass-card-sm" style="padding:14px;margin-bottom:16px;background:rgba(96,165,250,0.08);border-color:rgba(96,165,250,0.2);"><div style="font-size:12px;font-weight:600;color:#60a5fa;margin-bottom:6px;">平台建议理由</div><div style="font-size:13px;color:rgba(255,255,255,0.7);line-height:1.7;">${es.platform_rationale}</div></div>` : ''}
+            ${weaknessesHTML}
+            ${failureHTML}
+        </div>`;
+    }
+
+    // 通用格式（保持原有逻辑）
+    let strengthsHTML = '';
+    if (es.top_strengths && es.top_strengths.length) {
+        strengthsHTML = `<div style="margin-top:16px;"><div style="font-size:13px;font-weight:600;color:#4ade80;margin-bottom:8px;">核心优势</div>` +
+            es.top_strengths.map(s => `<div style="font-size:13px;color:rgba(255,255,255,0.7);padding:4px 0;padding-left:16px;border-left:2px solid rgba(34,197,94,0.3);margin-bottom:6px;">${s}</div>`).join('') +
+            `</div>`;
+    }
+    let risksHTML = '';
+    if (es.top_risks && es.top_risks.length) {
+        risksHTML = `<div style="margin-top:16px;"><div style="font-size:13px;font-weight:600;color:#f87171;margin-bottom:8px;">核心风险</div>` +
+            es.top_risks.map(s => `<div style="font-size:13px;color:rgba(255,255,255,0.7);padding:4px 0;padding-left:16px;border-left:2px solid rgba(239,68,68,0.3);margin-bottom:6px;">${s}</div>`).join('') +
+            `</div>`;
+    }
+    return `
+    <div id="sec-executive_summary" style="margin-top:48px;">
+        <h3 class="section-title gradient-text">执行摘要</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">对项目可行性的最高层概括，包括核心结论、关键指标和下一步行动建议。</p>
+        ${es.one_line_summary ? `<div class="glass-card-sm" style="padding:16px;margin-bottom:16px;"><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px;">一句话概括</div><div style="font-size:15px;font-weight:600;">${es.one_line_summary}</div></div>` : ''}
+        ${es.conclusion ? `<p style="font-size:14px;color:rgba(255,255,255,0.75);line-height:1.8;margin-bottom:16px;">${es.conclusion}</p>` : ''}
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px;">
+            ${km.grade ? `<div class="glass-card-sm" style="padding:14px;text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">评级</div><div class="grade-badge ${gradeClass(km.grade)}" style="width:44px;height:44px;font-size:20px;margin:4px auto;">${km.grade}</div><div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;">${km.grade_label||''}</div></div>` : ''}
+            ${km.total_score ? `<div class="glass-card-sm" style="padding:14px;text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">总分</div><div style="font-size:22px;font-weight:700;color:#60a5fa;">${km.total_score}</div></div>` : ''}
+            ${km.market_size_tam ? `<div class="glass-card-sm" style="padding:14px;text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">TAM</div><div style="font-size:16px;font-weight:600;">${km.market_size_tam}</div></div>` : ''}
+            ${km.gross_margin_pct ? `<div class="glass-card-sm" style="padding:14px;text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">毛利率</div><div style="font-size:16px;font-weight:600;color:#4ade80;">${km.gross_margin_pct}%</div></div>` : ''}
+            ${km.payback_months ? `<div class="glass-card-sm" style="padding:14px;text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">回本周期</div><div style="font-size:16px;font-weight:600;">${km.payback_months}月</div></div>` : ''}
+        </div>
+        ${strengthsHTML}
+        ${risksHTML}
+        ${es.recommendation ? `<div class="glass-card-sm" style="padding:16px;margin-top:20px;background:rgba(96,165,250,0.08);border-color:rgba(96,165,250,0.2);"><div style="font-size:12px;font-weight:600;color:#60a5fa;margin-bottom:6px;">下一步建议</div><div style="font-size:13px;color:rgba(255,255,255,0.7);line-height:1.7;">${es.recommendation}</div></div>` : ''}
+    </div>`;
+}
+
+function renderProjectProfile(d) {
+    const pp = d.project_profile;
+    if (!pp) return noDataHTML();
+    const isCrowdfunding = !!(pp.name && pp.tagline && pp.category && !pp.product_description);
+    // 支持两种格式
+    if (isCrowdfunding) {
+        // 众筹格式：name, tagline, category, subcategory, target_users(object), core_value, product_forms, tech_stack, team_background, evidence_available
+        let targetUsersHTML = '';
+        if (pp.target_users) {
+            const tu = pp.target_users;
+            if (typeof tu === 'object' && !Array.isArray(tu)) {
+                targetUsersHTML = `<div style="margin-bottom:16px;"><div style="font-size:13px;font-weight:600;margin-bottom:8px;">目标用户</div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;">
+                        ${tu.primary ? `<div class="glass-card-sm" style="padding:12px;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">主要用户</div><div style="font-size:13px;color:rgba(255,255,255,0.8);">${tu.primary}</div></div>` : ''}
+                        ${tu.secondary ? `<div class="glass-card-sm" style="padding:12px;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">次要用户</div><div style="font-size:13px;color:rgba(255,255,255,0.8);">${tu.secondary}</div></div>` : ''}
+                        ${tu.age_range ? `<div class="glass-card-sm" style="padding:12px;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">年龄范围</div><div style="font-size:13px;color:rgba(255,255,255,0.8);">${tu.age_range}</div></div>` : ''}
+                    </div></div>`;
+            } else if (Array.isArray(tu)) {
+                targetUsersHTML = `<div style="margin-bottom:16px;"><div style="font-size:13px;font-weight:600;margin-bottom:8px;">目标用户</div><div style="display:flex;flex-wrap:wrap;gap:6px;">` +
+                    tu.map(u => `<span class="tag tag-good">${u}</span>`).join('') + `</div></div>`;
+            }
+        }
+        let formsHTML = '';
+        if (pp.product_forms && pp.product_forms.length) {
+            formsHTML = `<div style="margin-top:16px;"><div style="font-size:13px;font-weight:600;margin-bottom:8px;">产品形态</div>
+                <table class="data-table"><thead><tr><th>档位</th><th>功能</th><th>价格</th></tr></thead><tbody>
+                    ${pp.product_forms.map(f => `<tr><td style="font-weight:600;color:#60a5fa;">${f.tier||''}</td><td>${f.features||''}</td><td>${f.price||''}</td></tr>`).join('')}
+                </tbody></table></div>`;
+        }
+        let techHTML = '';
+        if (pp.tech_stack && pp.tech_stack.length) {
+            techHTML = `<div style="margin-top:16px;"><div style="font-size:13px;font-weight:600;margin-bottom:8px;">技术栈</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;">` +
+                pp.tech_stack.map(t => `<span class="tag tag-good">${t}</span>`).join('') + `</div></div>`;
+        }
+        let evidenceHTML = '';
+        if (pp.evidence_available && pp.evidence_available.length) {
+            evidenceHTML = `<div style="margin-top:16px;"><div style="font-size:13px;font-weight:600;margin-bottom:8px;">已有证据</div><div style="display:flex;flex-wrap:wrap;gap:6px;">` +
+                pp.evidence_available.map(e => `<span class="tag tag-normal">${e}</span>`).join('') + `</div></div>`;
+        }
+        return `
+        <div id="sec-project_profile" style="margin-top:48px;">
+            <h3 class="section-title gradient-text">项目画像</h3>
+            <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">描述产品是什么、为谁服务、提供什么核心价值。</p>
+            ${pp.tagline ? `<div class="glass-card-sm" style="padding:16px;margin-bottom:16px;"><div style="font-size:15px;font-weight:600;">${pp.name || ''}</div><div style="font-size:13px;color:rgba(255,255,255,0.75);margin-top:6px;">${pp.tagline}</div></div>` : ''}
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-bottom:16px;">
+                ${pp.category ? `<div class="glass-card-sm" style="padding:12px;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">品类</div><div style="font-size:13px;font-weight:600;">${pp.category}</div></div>` : ''}
+                ${pp.subcategory ? `<div class="glass-card-sm" style="padding:12px;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">子品类</div><div style="font-size:13px;font-weight:600;">${pp.subcategory}</div></div>` : ''}
+                ${pp.team_background ? `<div class="glass-card-sm" style="padding:12px;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">团队背景</div><div style="font-size:13px;color:rgba(255,255,255,0.7);">${pp.team_background}</div></div>` : ''}
+                ${pp.company_founded ? `<div class="glass-card-sm" style="padding:12px;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">成立时间</div><div style="font-size:13px;font-weight:600;">${pp.company_founded}</div></div>` : ''}
+                ${pp.location ? `<div class="glass-card-sm" style="padding:12px;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">地点</div><div style="font-size:13px;font-weight:600;">${pp.location}</div></div>` : ''}
+            </div>
+            ${pp.core_value ? `<div style="margin-bottom:16px;"><div style="font-size:13px;font-weight:600;margin-bottom:6px;">核心价值</div><div style="font-size:14px;color:rgba(255,255,255,0.8);line-height:1.7;">${pp.core_value}</div></div>` : ''}
+            ${targetUsersHTML}
+            ${formsHTML}
+            ${techHTML}
+            ${evidenceHTML}
+        </div>`;
+    }
+
+    // 通用格式（保持原有逻辑）
+    let featuresHTML = '';
+    if (pp.core_features && pp.core_features.length) {
+        featuresHTML = `<div style="margin-top:16px;"><div style="font-size:13px;font-weight:600;margin-bottom:8px;">核心功能</div><div style="display:flex;flex-wrap:wrap;gap:6px;">` +
+            pp.core_features.map(f => `<span class="tag tag-good">${f}</span>`).join('') + `</div></div>`;
+    }
+    let versionsHTML = '';
+    if (pp.version_plan && pp.version_plan.length) {
+        versionsHTML = `<div style="margin-top:16px;"><div style="font-size:13px;font-weight:600;margin-bottom:8px;">版本规划</div>
+        <table class="data-table"><thead><tr><th>版本</th><th>范围</th><th>时间</th></tr></thead><tbody>` +
+            pp.version_plan.map(v => `<tr><td style="font-weight:600;color:#60a5fa;">${v.version}</td><td>${v.scope}</td><td>${v.timeline}</td></tr>`).join('') +
+            `</tbody></table></div>`;
+    }
+    return `
+    <div id="sec-project_profile" style="margin-top:48px;">
+        <h3 class="section-title gradient-text">项目画像</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">描述产品是什么、为谁服务、提供什么核心价值。</p>
+        ${pp.product_description ? `<div class="glass-card-sm" style="padding:16px;margin-bottom:16px;"><div style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.8;">${pp.product_description}</div></div>` : ''}
+        ${pp.value_proposition ? `<div style="margin-bottom:16px;"><div style="font-size:13px;font-weight:600;margin-bottom:6px;">价值主张</div><div style="font-size:14px;color:rgba(255,255,255,0.8);">${pp.value_proposition}</div></div>` : ''}
+        ${pp.target_users && pp.target_users.length ? `<div style="margin-bottom:16px;"><div style="font-size:13px;font-weight:600;margin-bottom:8px;">目标用户</div><div style="display:flex;flex-wrap:wrap;gap:6px;">` +
+            pp.target_users.map(u => `<span class="tag tag-good">${u}</span>`).join('') + `</div></div>` : ''}
+        ${featuresHTML}
+        ${versionsHTML}
+    </div>`;
+}
+
+function renderCaseStudies(d) {
+    let cs = d.case_studies;
+    // 兼容：如果 case_studies 是数组直接用，如果包含 similar_cases 则取子字段
+    if (cs && !Array.isArray(cs) && cs.similar_cases) {
+        cs = cs.similar_cases;
+    }
+    if (!cs || !Array.isArray(cs) || !cs.length) return noDataHTML();
+    return `
+    <div id="sec-case_studies" style="margin-top:48px;">
+        <h3 class="section-title gradient-text">竞品案例研究</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">通过真实案例回溯，提炼同类产品的成功要素和可复用经验。</p>
+        <div style="overflow-x:auto;">
+        <table class="data-table"><thead><tr><th>案例</th><th>平台</th><th>金额</th><th>支持者</th><th>成功因素</th><th>关联度</th></tr></thead><tbody>
+            ${cs.map(c => `<tr>
+                <td>${c.url ? `<a href="${c.url}" target="_blank" style="color:#60a5fa;text-decoration:none;">${c.name}</a>` : c.name}</td>
+                <td><span class="tag tag-good">${c.platform||'--'}</span></td>
+                <td style="font-weight:600;">${c.amount||'--'}</td>
+                <td>${c.backers||'--'}</td>
+                <td style="font-size:12px;">${c.key_lesson || (Array.isArray(c.success_factors) ? c.success_factors.join('、') : c.success_factors) || '--'}</td>
+                <td style="font-size:12px;">${c.relevance||'--'}</td>
+            </tr>`).join('')}
+        </tbody></table></div>
+    </div>`;
+}
+
+function renderMarketAnalysis(d) {
+    const ma = d.market_analysis;
+    if (!ma) return noDataHTML();
+    let trendsHTML = '';
+    if (ma.trends && ma.trends.length) {
+        trendsHTML = `<div style="margin-top:20px;"><div style="font-size:13px;font-weight:600;margin-bottom:10px;">市场趋势</div>
+        <div style="display:grid;gap:8px;">` +
+            ma.trends.map(t => `<div class="glass-card-sm" style="padding:12px;display:flex;align-items:center;gap:12px;justify-content:space-between;">
+                <div><div style="font-size:13px;font-weight:600;">${t.trend}</div><div style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px;">${t.description||''}</div></div>
+                ${impactTag(t.impact)}
+            </div>`).join('') + `</div></div>`;
+    }
+    let segmentsHTML = '';
+    if (ma.market_segments && ma.market_segments.length) {
+        segmentsHTML = `<div style="margin-top:20px;"><div style="font-size:13px;font-weight:600;margin-bottom:10px;">细分市场</div><div style="overflow-x:auto;">
+        <table class="data-table"><thead><tr><th>细分</th><th>份额</th><th>增长率</th></tr></thead><tbody>` +
+            ma.market_segments.map(s => `<tr><td style="font-weight:600;">${s.segment}</td><td>${s.share_pct||'--'}%</td><td>${s.growth_rate||'--'}</td></tr>`).join('') +
+            `</tbody></table></div></div>`;
+    }
+    return `
+    <div id="sec-market_analysis" style="margin-top:48px;">
+        <h3 class="section-title gradient-text">市场分析</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">整体市场环境、趋势和细分市场的结构化分析。</p>
+        ${ma.market_overview ? `<div class="glass-card-sm" style="padding:16px;margin-bottom:16px;"><div style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.8;">${ma.market_overview}</div></div>` : ''}
+        ${trendsHTML}
+        ${segmentsHTML}
+    </div>`;
+}
+
+function renderPEST(d) {
+    const p = d.pest_analysis;
+    if (!p) return noDataHTML();
+    const quadrants = ['political','economic','social','technological'];
+    const labels = { political:'P - 政治', economic:'E - 经济', social:'S - 社会', technological:'T - 技术' };
+    const colors = { political:'rgba(239,68,68,0.08)', economic:'rgba(96,165,250,0.08)', social:'rgba(167,139,250,0.08)', technological:'rgba(34,197,94,0.08)' };
+    const bcolors = { political:'rgba(239,68,68,0.2)', economic:'rgba(96,165,250,0.2)', social:'rgba(167,139,250,0.2)', technological:'rgba(34,197,94,0.2)' };
+    return `
+    <div id="sec-pest_analysis" style="margin-top:48px;">
+        <h3 class="section-title gradient-text">PEST 分析</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">从政治、经济、社会、技术四个维度评估宏观环境的影响。</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;">
+            ${quadrants.map(q => {
+                const d2 = p[q] || {};
+                return `<div class="glass-card-sm" style="padding:16px;background:${colors[q]};border-color:${bcolors[q]};">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                        <span style="font-size:14px;font-weight:700;">${labels[q] || q}</span>
+                        ${impactTag(d2.impact)}
+                    </div>
+                    <ul style="list-style:none;padding:0;margin:0;">
+                        ${(d2.factors||[]).map(f => `<li style="font-size:13px;color:rgba(255,255,255,0.7);padding:4px 0;padding-left:12px;border-left:2px solid rgba(255,255,255,0.15);margin-bottom:4px;">${f}</li>`).join('')}
+                    </ul>
+                </div>`;
+            }).join('')}
+        </div>
+    </div>`;
+}
+
+function renderPorterFive(d) {
+    const pf = d.porter_five_forces;
+    if (!pf) return noDataHTML();
+    const forces = ['supplier_power','buyer_power','new_entrants','substitutes','industry_rivalry'];
+    return `
+    <div id="sec-porter_five_forces" style="margin-top:48px;">
+        <h3 class="section-title gradient-text">波特五力分析</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">评估行业竞争结构的五个关键力量。</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;">
+            ${forces.map(f => {
+                const fd = pf[f] || {};
+                return `<div class="force-item">
+                    <div style="font-size:14px;font-weight:600;margin-bottom:6px;">${fd.name || f}</div>
+                    <div style="margin-bottom:8px;">${levelTag(fd.level)}</div>
+                    <div style="font-size:12px;color:rgba(255,255,255,0.6);line-height:1.6;">${fd.description || ''}</div>
+                </div>`;
+            }).join('')}
+        </div>
+    </div>`;
+}
+
+function renderSWOT(d) {
+    const s = d.swot_analysis;
+    if (!s) return noDataHTML();
+    const quads = [
+        { key:'strengths', label:'S - 优势 Strengths', cls:'swot-S', color:'#4ade80' },
+        { key:'weaknesses', label:'W - 劣势 Weaknesses', cls:'swot-W', color:'#f87171' },
+        { key:'opportunities', label:'O - 机会 Opportunities', cls:'swot-O', color:'#60a5fa' },
+        { key:'threats', label:'T - 威胁 Threats', cls:'swot-T', color:'#fcd34d' }
+    ];
+    return `
+    <div id="sec-swot_analysis" style="margin-top:48px;">
+        <h3 class="section-title gradient-text">SWOT 分析</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">从优势、劣势、机会、威胁四象限系统评估项目态势。</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;">
+            ${quads.map(q => {
+                const items = s[q.key] || [];
+                return `<div class="swot-quadrant ${q.cls}">
+                    <div style="font-size:14px;font-weight:700;margin-bottom:12px;color:${q.color};">${q.label}</div>
+                    ${items.length ? items.map(item => `
+                    <div style="padding:10px;background:rgba(0,0,0,0.15);border-radius:8px;margin-bottom:8px;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                            <span style="font-size:13px;font-weight:600;">${item.item}</span>
+                            ${impactTag(item.impact)}
+                        </div>
+                        ${item.evidence ? `<div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:4px;">证据：${item.evidence}</div>` : ''}
+                        ${item.action ? `<div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;">建议：${item.action}</div>` : ''}
+                    </div>`).join('') : '<div style="font-size:12px;color:rgba(255,255,255,0.35);">暂无数据</div>'}
+                </div>`;
+            }).join('')}
+        </div>
+    </div>`;
+}
+
+function renderBMC(d) {
+    const bmc = d.business_model_canvas;
+    if (!bmc) return noDataHTML();
+    const cells = [
+        { title:'价值主张', items: [bmc.value_proposition] },
+        { title:'客户细分', items: bmc.customer_segments },
+        { title:'渠道', items: bmc.channels },
+        { title:'客户关系', items: bmc.customer_relationships },
+        { title:'收入来源', items: (bmc.revenue_streams||[]).map(r => `${r.stream} (${r.model}, ${r.pricing||''})`) },
+        { title:'核心资源', items: bmc.key_resources },
+        { title:'核心活动', items: bmc.key_activities },
+        { title:'关键伙伴', items: bmc.key_partnerships },
+        { title:'成本结构', items: (bmc.cost_structure||[]).map(c => `${c.cost} (${c.type||''}, ${c.estimate||''})`) }
+    ];
+    return `
+    <div id="sec-business_model_canvas" style="margin-top:48px;">
+        <h3 class="section-title gradient-text">商业模式画布</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">以九宫格形式展示商业模式的完整逻辑。</p>
+        <div class="canvas-grid">
+            ${cells.map(c => `<div class="canvas-cell">
+                <div class="cell-title">${c.title}</div>
+                ${(c.items||[]).filter(Boolean).map(i => `<div style="font-size:12px;color:rgba(255,255,255,0.7);padding:3px 0;">${i}</div>`).join('') || '<div style="font-size:12px;color:rgba(255,255,255,0.3);">--</div>'}
+            </div>`).join('')}
+        </div>
+    </div>`;
+}
+
+function renderMarketSizing(d) {
+    const ms = d.market_sizing;
+    if (!ms) return noDataHTML();
+    const parseNum = s => { if (!s) return 0; return parseFloat(String(s).replace(/[^0-9.]/g,'')) || 0; };
+    const tamNum = parseNum(ms.tam?.value);
+    const samNum = parseNum(ms.sam?.value);
+    const somNum = parseNum(ms.som?.value);
+    const hasChart = tamNum > 0 && samNum > 0 && somNum > 0;
+    return `
+    <div id="sec-market_sizing" style="margin-top:48px;">
+        <h3 class="section-title gradient-text">市场规模估算</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">TAM/SAM/SOM 三层漏斗展示市场可获取规模。</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+            <div class="glass-card-sm" style="padding:20px;text-align:center;">
+                <div style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;">TAM - 总市场</div>
+                <div style="font-size:28px;font-weight:700;color:#60a5fa;margin:8px 0;">${ms.tam?.value||'--'}</div>
+                <div style="font-size:12px;color:rgba(255,255,255,0.5);">${ms.tam?.description||''}</div>
+            </div>
+            <div class="glass-card-sm" style="padding:20px;text-align:center;">
+                <div style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;">SAM - 可服务市场</div>
+                <div style="font-size:28px;font-weight:700;color:#a78bfa;margin:8px 0;">${ms.sam?.value||'--'}</div>
+                <div style="font-size:12px;color:rgba(255,255,255,0.5);">${ms.sam?.description||''}</div>
+            </div>
+            <div class="glass-card-sm" style="padding:20px;text-align:center;">
+                <div style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;">SOM - 可获得市场</div>
+                <div style="font-size:28px;font-weight:700;color:#4ade80;margin:8px 0;">${ms.som?.value||'--'}</div>
+                <div style="font-size:12px;color:rgba(255,255,255,0.5);">${ms.som?.description||''}</div>
+            </div>
+        </div>
+        ${hasChart ? `<div class="glass-card-sm" style="padding:20px;"><canvas id="chart-market-sizing" height="200"></canvas></div>` : ''}
+        ${ms.assumptions && ms.assumptions.length ? `<div style="margin-top:16px;"><div style="font-size:13px;font-weight:600;margin-bottom:8px;">关键假设</div><ul style="list-style:none;padding:0;">` +
+            ms.assumptions.map(a => `<li style="font-size:12px;color:rgba(255,255,255,0.6);padding:4px 0;padding-left:16px;border-left:2px solid rgba(255,255,255,0.15);margin-bottom:4px;">${a}</li>`).join('') +
+            `</ul></div>` : ''}
+    </div>`;
+}
+
+function renderFinancialModel(d) {
+    const fm = d.financial_model;
+    if (!fm) return noDataHTML();
+    let costsHTML = '', revenueHTML = '', breakEvenHTML = '', projectionsHTML = '';
+    if (fm.cost_structure && fm.cost_structure.length) {
+        costsHTML = `<div style="margin-bottom:16px;"><div style="font-size:13px;font-weight:600;margin-bottom:8px;">成本结构</div>
+        <table class="data-table"><thead><tr><th>项目</th><th>类型</th><th>月成本</th><th>说明</th></tr></thead><tbody>
+            ${fm.cost_structure.map(c => `<tr><td>${c.item}</td><td>${c.type||'--'}</td><td>${c.monthly ? '¥'+c.monthly.toLocaleString() : '--'}</td><td style="font-size:12px;">${c.notes||''}</td></tr>`).join('')}
+        </tbody></table></div>`;
+    }
+    if (fm.revenue_model && fm.revenue_model.length) {
+        revenueHTML = `<div style="margin-bottom:16px;"><div style="font-size:13px;font-weight:600;margin-bottom:8px;">收入模型</div>
+        <table class="data-table"><thead><tr><th>来源</th><th>单价</th><th>月销量</th><th>说明</th></tr></thead><tbody>
+            ${fm.revenue_model.map(r => `<tr><td>${r.item}</td><td>${r.unit_price ? '¥'+r.unit_price : '--'}</td><td>${r.monthly_units||'--'}</td><td style="font-size:12px;">${r.notes||''}</td></tr>`).join('')}
+        </tbody></table></div>`;
+    }
+    if (fm.break_even) {
+        breakEvenHTML = `<div class="glass-card-sm" style="padding:16px;margin-bottom:16px;display:flex;gap:24px;flex-wrap:wrap;">
+            <div><span style="font-size:11px;color:rgba(255,255,255,0.4);">盈亏平衡</span><div style="font-size:20px;font-weight:700;color:#4ade80;">${fm.break_even.months} 个月</div></div>
+            <div><span style="font-size:11px;color:rgba(255,255,255,0.4);">所需月收入</span><div style="font-size:20px;font-weight:700;color:#60a5fa;">${fm.break_even.monthly_revenue_needed ? '¥'+fm.break_even.monthly_revenue_needed.toLocaleString() : '--'}</div></div>
+            ${fm.break_even.description ? `<div style="flex:1;font-size:12px;color:rgba(255,255,255,0.5);">${fm.break_even.description}</div>` : ''}
+        </div>`;
+    }
+    const hasProj = fm.projections && fm.projections.length;
+    return `
+    <div id="sec-financial_model" style="margin-top:48px;">
+        <h3 class="section-title gradient-text">财务模型</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">成本结构、收入模型和盈亏平衡分析。</p>
+        ${breakEvenHTML}
+        ${costsHTML}
+        ${revenueHTML}
+        ${hasProj ? `<div class="glass-card-sm" style="padding:20px;"><canvas id="chart-financial" height="220"></canvas></div>` : ''}
+    </div>`;
+}
+
+function renderGrowthFlywheel(d) {
+    const gf = d.growth_flywheel;
+    if (!gf) return noDataHTML();
+    const aarrr = gf.aarrr || {};
+    const stages = ['acquisition','activation','retention','revenue','referral'];
+    const stageLabels = { acquisition:'获客 Acquisition', activation:'激活 Activation', retention:'留存 Retention', revenue:'收入 Revenue', referral:'推荐 Referral' };
+    const stageColors = ['#60a5fa','#a78bfa','#4ade80','#fcd34d','#f87171'];
+    return `
+    <div id="sec-growth_flywheel" style="margin-top:48px;">
+        <h3 class="section-title gradient-text">增长飞轮</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">基于 AARRR 模型的增长漏斗和飞轮设计。</p>
+        ${gf.flywheel_description ? `<div class="glass-card-sm" style="padding:16px;margin-bottom:20px;"><div style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.8;">${gf.flywheel_description}</div></div>` : ''}
+        <div style="display:flex;flex-direction:column;gap:12px;">
+            ${stages.map((s,i) => {
+                const sd = aarrr[s] || {};
+                return `<div class="glass-card-sm" style="padding:16px;border-left:4px solid ${stageColors[i]};">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                        <div style="width:32px;height:32px;border-radius:50%;background:${stageColors[i]}20;color:${stageColors[i]};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;">${i+1}</div>
+                        <div style="font-size:15px;font-weight:600;">${stageLabels[s] || s}</div>
+                    </div>
+                    ${sd.notes ? `<div style="font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:8px;">${sd.notes}</div>` : ''}
+                    ${sd.metrics && sd.metrics.length ? `<div style="display:flex;flex-wrap:wrap;gap:6px;">` +
+                        sd.metrics.map(m => `<span class="tag tag-good">${m}</span>`).join('') + `</div>` : ''}
+                </div>`;
+            }).join('')}
+        </div>
+    </div>`;
+}
+
+function renderTimeline(d) {
+    const tl = d.timeline;
+    if (!tl) return noDataHTML();
+    // 支持两种格式：phases 数组 或 7_day_tasks/30_day_plan
+    if (tl.phases && tl.phases.length) {
+        return `
+        <div id="sec-timeline" style="margin-top:48px;">
+            <h3 class="section-title gradient-text">时间规划</h3>
+            <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">从验证到规模化的阶段性时间线和里程碑。</p>
+            <div>
+                ${tl.phases.map((p,i) => `<div class="timeline-item">
+                    <div class="dot"></div>
+                    <div class="glass-card-sm" style="padding:16px;">
+                        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
+                            <span style="font-size:15px;font-weight:700;">${p.phase}</span>
+                            <span class="tag tag-good">${p.period}</span>
+                        </div>
+                        <div style="font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:8px;">目标：${p.goal}</div>
+                        ${p.tasks && p.tasks.length ? `<div style="font-size:12px;color:rgba(255,255,255,0.5);">任务：
+                            ${p.tasks.map(t => `<span style="display:inline-block;background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:4px;margin:2px;">${t}</span>`).join('')}
+                        </div>` : ''}
+                        ${p.success_criteria ? `<div style="font-size:12px;color:rgba(96,165,250,0.7);margin-top:6px;">成功标准：${p.success_criteria}</div>` : ''}
+                    </div>
+                </div>`).join('')}
+            </div>
+        </div>`;
+    }
+    // 众筹格式：7_day_tasks, key_shortcomings, 30_day_plan, verdict, milestone_conditions
+    let tasksHTML = '';
+    if (tl['7_day_tasks'] && tl['7_day_tasks'].length) {
+        tasksHTML = `<div style="margin-bottom:20px;"><div style="font-size:13px;font-weight:600;margin-bottom:10px;">7 天关键任务</div>
+            <div style="display:grid;gap:8px;">
+                ${tl['7_day_tasks'].map(t => `<div class="glass-card-sm" style="padding:12px;font-size:13px;color:rgba(255,255,255,0.8);line-height:1.6;">${t}</div>`).join('')}
+            </div></div>`;
+    }
+    let shortcomingsHTML = '';
+    if (tl.key_shortcomings && tl.key_shortcomings.length) {
+        shortcomingsHTML = `<div style="margin-bottom:20px;"><div style="font-size:13px;font-weight:600;margin-bottom:10px;">关键短板</div>
+            <div style="display:grid;gap:8px;">
+                ${tl.key_shortcomings.map(s => `<div class="glass-card-sm" style="padding:12px;font-size:13px;color:rgba(251,191,36,0.9);">${s}</div>`).join('')}
+            </div></div>`;
+    }
+    let planHTML = '';
+    if (tl['30_day_plan'] && tl['30_day_plan'].length) {
+        planHTML = `<div style="margin-bottom:20px;"><div style="font-size:13px;font-weight:600;margin-bottom:10px;">30 天推进计划</div>
+            <div style="display:grid;gap:8px;">
+                ${tl['30_day_plan'].map((p,i) => `<div class="timeline-item">
+                    <div class="dot"></div>
+                    <div class="glass-card-sm" style="padding:12px;font-size:13px;color:rgba(255,255,255,0.8);">${p}</div>
+                </div>`).join('')}
+            </div></div>`;
+    }
+    return `
+    <div id="sec-timeline" style="margin-top:48px;">
+        <h3 class="section-title gradient-text">时间规划</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">从验证到规模化的阶段性时间线和里程碑。</p>
+        ${tl.verdict ? `<div class="glass-card-sm" style="padding:16px;margin-bottom:20px;background:rgba(96,165,250,0.08);border-color:rgba(96,165,250,0.2);"><div style="font-size:12px;font-weight:600;color:#60a5fa;margin-bottom:6px;">结论</div><div style="font-size:14px;color:rgba(255,255,255,0.8);line-height:1.7;">${tl.verdict}</div></div>` : ''}
+        ${tasksHTML}
+        ${shortcomingsHTML}
+        ${planHTML}
+        ${tl.milestone_conditions ? `<div class="glass-card-sm" style="padding:16px;margin-top:16px;"><div style="font-size:12px;font-weight:600;color:#a78bfa;margin-bottom:6px;">里程碑条件</div><div style="font-size:13px;color:rgba(255,255,255,0.7);line-height:1.7;">${tl.milestone_conditions}</div></div>` : ''}
+    </div>`;
+}
+
+function renderTechArchitecture(d) {
+    const ta = d.tech_architecture;
+    if (!ta) return noDataHTML();
+    const dims = ['tech_maturity','tech_complexity','supply_chain','security','scalability'];
+    return `
+    <div id="sec-tech_architecture" style="margin-top:48px;">
+        <h3 class="section-title gradient-text">技术架构评估</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">评估技术成熟度、复杂度、供应链可靠性和扩展性。</p>
+        <div style="overflow-x:auto;">
+        <table class="data-table"><thead><tr><th>维度</th><th>等级</th><th>说明</th></tr></thead><tbody>
+            ${dims.map(dm => {
+                const d2 = ta[dm] || {};
+                return `<tr><td style="font-weight:600;">${d2.name||dm}</td><td>${levelTag(d2.level)}</td><td style="font-size:12px;">${d2.notes||''}</td></tr>`;
+            }).join('')}
+            <tr><td colspan="3" style="font-size:12px;color:rgba(255,255,255,0.5);">整体风险等级：${levelTag(ta.risk_level)} ${ta.notes||''}</td></tr>
+        </tbody></table></div>
+    </div>`;
+}
+
+function renderCategoryChecks(d) {
+    const cc = d.category_checks;
+    if (!cc || !cc.checks || !cc.checks.length) return noDataHTML();
+    const catLabels = {hardware:'硬件/消费品',saas:'SaaS/效率工具',service:'服务/咨询',content:'内容/社群',b2b:'B2B/企业级',platform:'平台/双边市场',community:'社群/平台'};
+    return `
+    <div id="sec-category_checks" style="margin-top:48px;">
+        <h3 class="section-title gradient-text">品类特别检查</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">针对「${catLabels[cc.category]||cc.category||'通用'}」品类的专项检查清单。</p>
+        <div style="display:grid;gap:8px;">
+            ${cc.checks.map(c => `<div class="glass-card-sm" style="padding:14px;display:flex;align-items:center;gap:14px;">
+                <div style="min-width:32px;">${checkStatusIcon(c.status)}</div>
+                <div style="flex:1;">
+                    <div style="font-size:13px;font-weight:600;">${c.item}</div>
+                    ${c.notes ? `<div style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px;">${c.notes}</div>` : ''}
+                </div>
+                <span class="tag ${c.status==='pass'?'tag-good':c.status==='fail'?'tag-risk':'tag-normal'}">${c.status==='pass'?'通过':c.status==='fail'?'未通过':'警告'}</span>
+            </div>`).join('')}
+        </div>
+    </div>`;
+}
+
+function renderRiskAnalysis(d) {
+    const ra = d.risk_analysis;
+    if (!ra) return noDataHTML();
+    let risksHTML = '';
+    if (ra.project_risks && ra.project_risks.length) {
+        risksHTML = `<div style="margin-bottom:20px;"><div style="font-size:13px;font-weight:600;margin-bottom:10px;">项目风险</div>
+        <table class="data-table"><thead><tr><th>类型</th><th>描述</th><th>等级</th><th>应对措施</th></tr></thead><tbody>
+            ${ra.project_risks.map(r => `<tr><td style="font-weight:600;">${r.type || r.risk || '--'}</td><td style="font-size:12px;">${r.description||''}</td><td>${impactTag(r.level || r.severity)}</td><td style="font-size:12px;">${r.mitigation||''}</td></tr>`).join('')}
+        </tbody></table></div>`;
+    }
+    let failureHTML = '';
+    if (ra.failure_patterns && ra.failure_patterns.length) {
+        failureHTML = `<div><div style="font-size:13px;font-weight:600;margin-bottom:10px;">失败模式</div>
+        <table class="data-table"><thead><tr><th>模式</th><th>严重度</th><th>预防</th><th>参考案例</th></tr></thead><tbody>
+            ${ra.failure_patterns.map(fp => `<tr><td style="font-weight:600;">${fp.pattern||'--'}</td><td>${fp.severity||fp.frequency||'--'}</td><td style="font-size:12px;">${fp.prevention||''}</td><td style="font-size:12px;">${fp.case_reference||fp.relevance||''}</td></tr>`).join('')}
+        </tbody></table></div>`;
+    }
+    return `
+    <div id="sec-risk_analysis" style="margin-top:48px;">
+        <h3 class="section-title gradient-text">风险与失败模式</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">识别项目面临的各类风险，并参考同类产品的失败模式制定预防策略。</p>
+        ${risksHTML}
+        ${failureHTML}
+    </div>`;
+}
+
+function renderFeasibilityScore(d) {
+    const fs = d.feasibility_score;
+    if (!fs) return noDataHTML();
+    const dims = fs.dimensions || [];
+    const hasChart = dims.length > 0;
+    return `
+    <div id="sec-feasibility_score" style="margin-top:48px;">
+        <h3 class="section-title gradient-text">可行性评分</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">基于品类权重的 12 维度评分模型，满分 100 分。</p>
+        <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;margin-bottom:20px;">
+            <div style="flex:1;min-width:280px;">
+                <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+                    <div class="grade-badge ${gradeClass(fs.grade)}" style="width:56px;height:56px;font-size:24px;">${fs.grade||'?'}</div>
+                    <div>
+                        <div style="font-size:28px;font-weight:700;">${fs.total_score||0}<span style="font-size:14px;color:rgba(255,255,255,0.4);">/100</span></div>
+                        <div style="font-size:13px;color:rgba(255,255,255,0.6);">${fs.grade_label||''}</div>
+                    </div>
+                </div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.35);">品类权重模板：${fs.category_weights||'default'}</div>
+            </div>
+            ${hasChart ? `<div class="glass-card-sm" style="padding:16px;width:300px;flex-shrink:0;"><canvas id="chart-radar" height="280"></canvas></div>` : ''}
+        </div>
+        ${dims.length ? `<div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>维度</th><th>权重</th><th>得分</th><th>满分</th><th>得分率</th><th>说明</th></tr></thead><tbody>
+            ${dims.map(dm => {
+                const dmMax = dm.max || dm.max_score || 1;
+                const pct = dmMax > 0 ? Math.round(dm.score / dmMax * 100) : 0;
+                const barColor = pct >= 80 ? '#4ade80' : pct >= 60 ? '#60a5fa' : pct >= 40 ? '#fcd34d' : '#f87171';
+                return `<tr>
+                    <td style="font-weight:600;">${dm.name}</td>
+                    <td>${dm.weight}</td>
+                    <td style="font-weight:600;color:${barColor};">${dm.score}</td>
+                    <td>${dm.max || dm.max_score || '--'}</td>
+                    <td><div style="display:flex;align-items:center;gap:8px;"><div style="flex:1;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;min-width:60px;"><div style="width:${pct}%;height:100%;background:${barColor};border-radius:3px;"></div></div><span style="font-size:11px;color:rgba(255,255,255,0.5);">${pct}%</span></div></td>
+                    <td style="font-size:12px;">${dm.notes||''}</td>
+                </tr>`;
+            }).join('')}
+        </tbody></table></div>` : ''}
+    </div>`;
+}
+
+function renderExitStrategy(d) {
+    const es = d.exit_strategy;
+    if (!es) return noDataHTML();
+    let optsHTML = '';
+    if (es.options && es.options.length) {
+        optsHTML = `<div style="margin-bottom:20px;"><div style="font-size:13px;font-weight:600;margin-bottom:10px;">退出选项</div>
+        <table class="data-table"><thead><tr><th>方案</th><th>条件</th><th>回报</th><th>风险</th></tr></thead><tbody>
+            ${es.options.map(o => `<tr><td style="font-weight:600;">${o.option}</td><td>${o.condition||'--'}</td><td>${o.return||'--'}</td><td>${o.risk||'--'}</td></tr>`).join('')}
+        </tbody></table></div>`;
+    }
+    let stopsHTML = '';
+    if (es.stop_loss_triggers && es.stop_loss_triggers.length) {
+        stopsHTML = `<div><div style="font-size:13px;font-weight:600;margin-bottom:10px;">止损触发条件</div><div style="display:grid;gap:8px;">
+            ${es.stop_loss_triggers.map(sl => `<div class="glass-card-sm" style="padding:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+                <span class="tag tag-risk">${sl.type}</span>
+                <span style="font-size:13px;">${sl.indicator}</span>
+                <span style="font-size:13px;color:rgba(255,255,255,0.5);">&rarr; ${sl.threshold}</span>
+                <span style="font-size:13px;color:rgba(96,165,250,0.7);">行动：${sl.action}</span>
+            </div>`).join('')}
+        </div></div>`;
+    }
+    return `
+    <div id="sec-exit_strategy" style="margin-top:48px;">
+        <h3 class="section-title gradient-text">退出策略与止损</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">预设退出路径和止损机制，确保理性决策。</p>
+        ${optsHTML}
+        ${stopsHTML}
+    </div>`;
+}
+
+function renderCrowdfunding(d) {
+    const cf = d.crowdfunding;
+    if (!cf) return noDataHTML();
+    let platformHTML = '';
+    if (cf.platform_comparison && cf.platform_comparison.length) {
+        platformHTML = `<div style="margin-bottom:20px;"><div style="font-size:13px;font-weight:600;margin-bottom:10px;">平台对比</div>
+        <table class="data-table"><thead><tr><th>平台</th><th>匹配度</th><th>优势</th><th>劣势</th><th>费用</th><th>成功率</th></tr></thead><tbody>
+            ${cf.platform_comparison.map(p => `<tr>
+                <td style="font-weight:600;${p.platform===cf.recommended_platform?'color:#4ade80;':''}">${(() => { const platformUrls = {'嘖嘖 zeczec':'https://www.zeczec.com','Kickstarter':'https://www.kickstarter.com','Makuake':'https://www.makuake.com','Indiegogo':'https://www.indiegogo.com','flyingV':'https://www.flyingv.cc'}; const url = p.url || platformUrls[p.platform] || ''; return url ? `<a href="${url}" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">${p.platform}</a>` : p.platform; })()}${p.platform===cf.recommended_platform?' &#10003;':''}</td>
+                <td><span style="font-weight:700;color:#60a5fa;">${p.match_score}分</span></td>
+                <td style="font-size:12px;">${(p.pros||[]).join('、')||'--'}</td>
+                <td style="font-size:12px;">${(p.cons||[]).join('、')||'--'}</td>
+                <td>${p.fee||'--'}</td>
+                <td>${p.success_rate||'--'}</td>
+            </tr>`).join('')}
+        </tbody></table></div>`;
+    }
+    let pricingHTML = '';
+    // 支持数组格式和对象格式
+    const pricingItems = cf.pricing_strategy ? (Array.isArray(cf.pricing_strategy) ? cf.pricing_strategy : Object.values(cf.pricing_strategy).filter(v => typeof v === 'object' && v.tier)) : [];
+    if (pricingItems.length) {
+        pricingHTML = `<div style="margin-bottom:20px;"><div style="font-size:13px;font-weight:600;margin-bottom:10px;">定价档位</div>
+        <table class="data-table"><thead><tr><th>档位</th><th>价格</th><th>限量</th><th>说明</th></tr></thead><tbody>
+            ${pricingItems.map(ps => `<tr><td style="font-weight:600;">${ps.tier}</td><td style="color:#60a5fa;font-weight:600;">${ps.price}</td><td>${ps.quota||ps.limit||'不限'}</td><td style="font-size:12px;">${ps.rationale||ps.description||''}</td></tr>`).join('')}
+        </tbody></table></div>`;
+    }
+    let estimateHTML = '';
+    const se = cf.supporter_estimates || cf.supporter_estimation;
+    if (se) {
+        const targetAmount = se.target_amount || se.target_goal || 0;
+        const avgPledge = se.avg_pledge || se.average_pledge || 0;
+        const neededSupporters = se.needed_supporters || se.required_backers || 0;
+        const dailyTarget = se.daily_target || se.daily_target_first_week || 0;
+        const campaignDays = se.campaign_days || 0;
+        estimateHTML = `<div class="glass-card-sm" style="padding:16px;margin-bottom:20px;">
+            <div style="font-size:13px;font-weight:600;margin-bottom:12px;">支持者估算</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;">
+                <div style="text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">目标金额</div><div style="font-size:18px;font-weight:700;color:#60a5fa;">${targetAmount}</div></div>
+                <div style="text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">平均支持</div><div style="font-size:18px;font-weight:700;">${avgPledge}</div></div>
+                <div style="text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">需要支持者</div><div style="font-size:18px;font-weight:700;">${neededSupporters}</div></div>
+                <div style="text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">日均目标</div><div style="font-size:18px;font-weight:700;">${dailyTarget}</div></div>
+                ${campaignDays ? `<div style="text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,0.4);">活动天数</div><div style="font-size:18px;font-weight:700;">${campaignDays}天</div></div>` : ''}
+            </div>
+            ${se.feasibility ? `<div style="margin-top:12px;font-size:12px;color:rgba(255,255,255,0.6);border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;">可行性评估：${se.feasibility}</div>` : ''}
+        </div>`;
+    }
+    let deliveryHTML = '';
+    if (cf.delivery_plan) {
+        const dp = cf.delivery_plan;
+        deliveryHTML = `<div style="margin-bottom:20px;">
+            <div style="font-size:13px;font-weight:600;margin-bottom:8px;">交付计划 <span style="color:rgba(255,255,255,0.5);font-weight:400;">预计交付：${dp.estimated_delivery||'--'}</span></div>
+            ${(dp.milestones||[]).length ? `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;">
+                ${dp.milestones.map(m => typeof m === 'string' ? `<div class="glass-card-sm" style="padding:12px;text-align:center;"><div style="font-size:13px;font-weight:600;">${m}</div></div>` : `<div class="glass-card-sm" style="padding:12px;text-align:center;"><div style="font-size:13px;font-weight:600;">${m.milestone}</div><div style="font-size:11px;color:rgba(255,255,255,0.4);">${m.date||''}</div><span class="tag ${m.status==='完成'?'tag-good':'tag-normal'}" style="font-size:10px;margin-top:6px;">${m.status||'待定'}</span></div>`).join('')}
+            </div>` : ''}
+        </div>`;
+    }
+    let promoHTML = '';
+    if (cf.promotion_strategy) {
+        const pr = cf.promotion_strategy;
+        promoHTML = `<div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:10px;">推广策略</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;">
+                ${[['预热期',pr.pre_launch],['活动中',pr.during_campaign],['最终冲刺',pr.final_push||pr.post_campaign]].map(([label,items]) => `
+                <div class="glass-card-sm" style="padding:14px;"><div style="font-size:12px;font-weight:600;color:#a78bfa;margin-bottom:8px;">${label}</div>
+                    ${(items||[]).map(i => `<div style="font-size:12px;color:rgba(255,255,255,0.6);padding:3px 0;padding-left:10px;border-left:2px solid rgba(255,255,255,0.1);margin-bottom:4px;">${i}</div>`).join('')}
+                </div>`).join('')}
+            </div>
+        </div>`;
+    }
+    return `
+    <div id="sec-crowdfunding" style="margin-top:48px;">
+        <h3 class="section-title gradient-text">募资可行性评估</h3>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin:12px 0 20px;">评估募资平台匹配度、定价策略、推广计划和交付可行性。</p>
+        ${platformHTML}
+        ${pricingHTML}
+        ${estimateHTML}
+        ${deliveryHTML}
+        ${promoHTML}
+    </div>`;
+}
+
+// ============================================================
+// Chart rendering
+// ============================================================
+function renderCharts(d) {
+    // Radar chart for feasibility score
+    const fs = d.feasibility_score;
+    if (fs && fs.dimensions && fs.dimensions.length) {
+        const ctx = document.getElementById('chart-radar');
+        if (ctx) {
+            const labels = fs.dimensions.map(dm => dm.name);
+            const data = fs.dimensions.map(dm => { const dmMax = dm.max || dm.max_score || 1; return dmMax > 0 ? Math.round(dm.score/dmMax*100) : 0; });
+            const chart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: '得分率 %',
+                        data,
+                        backgroundColor: 'rgba(96,165,250,0.15)',
+                        borderColor: '#60a5fa',
+                        pointBackgroundColor: '#60a5fa',
+                        pointBorderColor: '#fff',
+                        pointRadius: 4,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { display: false, stepSize: 20 },
+                            grid: { color: 'rgba(255,255,255,0.08)' },
+                            angleLines: { color: 'rgba(255,255,255,0.08)' },
+                            pointLabels: { color: 'rgba(255,255,255,0.6)', font: { size: 10 } }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+            chartInstances.push(chart);
+        }
+    }
+
+    // Financial projections chart
+    const fm = d.financial_model;
+    if (fm && fm.projections && fm.projections.length) {
+        const ctx2 = document.getElementById('chart-financial');
+        if (ctx2) {
+            const chart2 = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: fm.projections.map(p => p.month),
+                    datasets: [
+                        {
+                            label: '收入',
+                            data: fm.projections.map(p => p.revenue),
+                            borderColor: '#4ade80',
+                            backgroundColor: 'rgba(34,197,94,0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: '成本',
+                            data: fm.projections.map(p => p.cost),
+                            borderColor: '#f87171',
+                            backgroundColor: 'rgba(239,68,68,0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: '利润',
+                            data: fm.projections.map(p => p.profit),
+                            borderColor: '#60a5fa',
+                            backgroundColor: 'rgba(96,165,250,0.1)',
+                            fill: true,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 } } },
+                        y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 }, callback: v => '¥'+v.toLocaleString() } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: 'rgba(255,255,255,0.6)', font: { size: 11 } } }
+                    }
+                }
+            });
+            chartInstances.push(chart2);
+        }
+    }
+
+    // Market sizing bar chart
+    const ms = d.market_sizing;
+    if (ms && ms.tam && ms.sam && ms.som) {
+        const parseNum = s => { if (!s) return 0; return parseFloat(String(s).replace(/[^0-9.]/g,'')) || 0; };
+        const tamNum = parseNum(ms.tam.value);
+        const samNum = parseNum(ms.sam.value);
+        const somNum = parseNum(ms.som.value);
+        if (tamNum > 0 && samNum > 0 && somNum > 0) {
+            const ctx3 = document.getElementById('chart-market-sizing');
+            if (ctx3) {
+                const chart3 = new Chart(ctx3, {
+                    type: 'bar',
+                    data: {
+                        labels: ['TAM (总市场)', 'SAM (可服务市场)', 'SOM (可获得市场)'],
+                        datasets: [{
+                            data: [tamNum, samNum, somNum],
+                            backgroundColor: ['rgba(96,165,250,0.6)', 'rgba(167,139,250,0.6)', 'rgba(74,222,128,0.6)'],
+                            borderColor: ['#60a5fa', '#a78bfa', '#4ade80'],
+                            borderWidth: 2,
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 } } },
+                            y: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.6)', font: { size: 11 } } }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+                chartInstances.push(chart3);
+            }
+        }
+    }
+}
+
+// ============================================================
+// Dynamic nav generation
+// ============================================================
+const NAV_MAP = {
+    'cover':               '封面页',
+    'sec-executive_summary': '执行摘要',
+    'sec-project_profile': '项目画像',
+    'sec-swot_analysis':   'SWOT分析',
+    'sec-case_studies':    '竞品案例研究',
+    'sec-risk_analysis':   '风险分析',
+    'sec-feasibility_score': '可行性评分',
+    'sec-crowdfunding':    '募资评估',
+    'sec-timeline':        '时间规划',
+    'sec-market_analysis': '市场分析',
+    'sec-pest_analysis':   'PEST分析',
+    'sec-porter_five_forces': '波特五力',
+    'sec-business_model_canvas': '商业模式画布',
+    'sec-market_sizing':  '市场规模估算',
+    'sec-financial_model': '财务模型',
+    'sec-growth_flywheel': '增长飞轮',
+    'sec-tech_architecture': '技术架构评估',
+    'sec-exit_strategy':   '退出策略'
+};
+
+function buildNavHTML(analysisType) {
+    const crowdfundingOrder = [
+        'cover', 'sec-executive_summary', 'sec-feasibility_score', 'sec-project_profile',
+        'sec-swot_analysis', 'sec-case_studies',
+        'sec-risk_analysis',
+        'sec-crowdfunding', 'sec-timeline'
+    ];
+    const generalOrder = [
+        'cover', 'sec-executive_summary', 'sec-project_profile',
+        'sec-market_analysis', 'sec-pest_analysis', 'sec-porter_five_forces',
+        'sec-swot_analysis', 'sec-business_model_canvas', 'sec-case_studies',
+        'sec-market_sizing', 'sec-financial_model', 'sec-growth_flywheel',
+        'sec-tech_architecture', 'sec-risk_analysis', 'sec-feasibility_score',
+        'sec-exit_strategy', 'sec-timeline'
+    ];
+    const order = analysisType === 'crowdfunding' ? crowdfundingOrder : generalOrder;
+    return order.map(id => {
+        const label = NAV_MAP[id] || id;
+        return `<a class="nav-item" data-target="${id}">${label}</a>`;
+    }).join('\n');
+}
+
+// Re-bind nav click handlers after dynamic generation
+function bindNavHandlers() {
+    document.querySelectorAll('#sidebar .nav-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('data-target');
+            const el = document.getElementById(targetId);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('show');
+        });
+    });
+}
+
+// ============================================================
+// Main render
+// ============================================================
+function renderReport() {
+    const input = document.getElementById('json-input').value.trim();
+    const status = document.getElementById('parse-status');
+
+    if (!input) {
+        status.innerHTML = '<span style="color:#f87171;">请粘贴 JSON 数据</span>';
+        return;
+    }
+
+    let data;
+    try {
+        data = JSON.parse(input);
+    } catch (e) {
+        status.innerHTML = `<span style="color:#f87171;">JSON 解析失败：${e.message}</span>`;
+        return;
+    }
+
+    try {
+    // Normalize: wrap old format into new schema
+    if (data.product && !data.meta) {
+        data.meta = {
+            product_name: data.product.name || '',
+            category: data.product.category || data.category || '',
+            generated_at: data.generated_at || new Date().toISOString(),
+            analyzer: '',
+            schema_version: '1.0'
+        };
+    }
+    if (!data.meta && data.product_name) {
+        data.meta = { product_name: data.product_name, category: '', generated_at: '', analyzer: '', schema_version: '1.0' };
+    }
+
+    currentData = data;
+    status.innerHTML = '<span style="color:#4ade80;">JSON 解析成功，正在渲染报告...</span>';
+
+    destroyCharts();
+
+    // Determine analysis type
+    const analysisType = (data.meta && data.meta.analysis_type) || 'general';
+    const isCrowdfunding = analysisType === 'crowdfunding';
+
+    // Build dynamic navigation
+    document.getElementById('nav-items').innerHTML = buildNavHTML(analysisType);
+    bindNavHandlers();
+
+    const reportEl = document.getElementById('report');
+    let html = '';
+
+    // Render cover (always)
+    html += renderCover(data);
+
+    if (isCrowdfunding) {
+        // Crowdfunding template
+        html += renderExecutiveSummary(data);
+        html += renderFeasibilityScore(data);
+        html += renderProjectProfile(data);
+        html += renderSWOT(data);
+        html += renderCaseStudies(data);
+        html += renderRiskAnalysis(data);
+        html += renderCrowdfunding(data);
+        html += renderTimeline(data);
+    } else {
+        // General template
+        html += renderExecutiveSummary(data);
+        html += renderProjectProfile(data);
+        html += renderMarketAnalysis(data);
+        html += renderPEST(data);
+        html += renderPorterFive(data);
+        html += renderSWOT(data);
+        html += renderBMC(data);
+        html += renderCaseStudies(data);
+        html += renderMarketSizing(data);
+        html += renderFinancialModel(data);
+        html += renderGrowthFlywheel(data);
+        html += renderTechArchitecture(data);
+        html += renderRiskAnalysis(data);
+        html += renderFeasibilityScore(data);
+        html += renderExitStrategy(data);
+        html += renderTimeline(data);
+    }
+
+    reportEl.innerHTML = html;
+
+    // Render charts after DOM is ready
+    requestAnimationFrame(() => {
+        renderCharts(data);
+    });
+
+    document.getElementById('export-bar').style.display = 'block';
+    status.innerHTML = '<span style="color:#4ade80;">报告渲染完成</span>';
+
+    // Scroll to cover
+    document.getElementById('cover').scrollIntoView({ behavior: 'smooth' });
+
+    } catch (renderError) {
+        console.error('报告渲染错误:', renderError);
+        status.innerHTML = `<span style="color:#f87171;">报告渲染过程中发生错误：${renderError.message}</span><br><span style="font-size:12px;color:rgba(255,255,255,0.5);">请检查浏览器控制台获取详细信息</span>`;
+        // 尝试输出已渲染的部分内容
+        if (reportEl && html) {
+            reportEl.innerHTML = html + `<div class="glass-card-sm" style="padding:24px;margin-top:20px;background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.3);text-align:center;"><div style="font-size:14px;color:#f87171;font-weight:600;">渲染过程中发生错误</div><div style="font-size:13px;color:rgba(255,255,255,0.6);margin-top:8px;">${renderError.message}</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;">请检查浏览器控制台获取完整错误信息</div></div>`;
+        }
+    }
+}
+
+function clearReport() {
+    document.getElementById('report').innerHTML = `<div class="no-data" style="padding: 100px 40px;">
+        <div style="font-size:48px;opacity:0.15;margin-bottom:16px;">&#128202;</div>
+        <div style="font-size:16px;">尚未生成报告</div>
+        <div style="font-size:13px;margin-top:4px;">粘贴 JSON 数据并点击"渲染报告"开始</div>
+    </div>`;
+    document.getElementById('export-bar').style.display = 'none';
+    document.getElementById('parse-status').innerHTML = '';
+    currentData = null;
+    destroyCharts();
+}
+
+// ============================================================
+// Export functions
+// ============================================================
+function downloadHTML() {
+    if (!currentData) return;
+    const reportHTML = document.getElementById('report').innerHTML;
+    const meta = currentData.meta || {};
+    const productName = meta.product_name || 'report';
+
+    const fullHTML = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${productName} - 可行性分析报告</title>
+    <script src="https://cdn.tailwindcss.com"><\/script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"><\/script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Noto Sans SC', sans-serif; background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%); min-height: 100vh; color: #e4e4e7; margin: 0; }
+        .glass-card { background: rgba(255,255,255,0.08); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; }
+        .glass-card-sm { background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; }
+        .gradient-text { background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .tag-excellent, .tag-good { background: rgba(34,197,94,0.2); color: #4ade80; }
+        .tag-normal { background: rgba(251,191,36,0.2); color: #fcd34d; }
+        .tag-poor, .tag-risk { background: rgba(239,68,68,0.2); color: #fca5a5; }
+        .section-title { position: relative; display: inline-block; font-size: 1.5rem; font-weight: 700; }
+        .section-title::after { content: ''; position: absolute; bottom: -6px; left: 0; width: 50px; height: 3px; background: linear-gradient(90deg, #60a5fa, #a78bfa); border-radius: 2px; }
+        .grade-badge { display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: 700; border: 3px solid; }
+        .grade-S { border-color: #4ade80; color: #4ade80; background: rgba(34,197,94,0.1); }
+        .grade-A { border-color: #60a5fa; color: #60a5fa; background: rgba(96,165,250,0.1); }
+        .grade-B { border-color: #a78bfa; color: #a78bfa; background: rgba(167,139,250,0.1); }
+        .grade-C { border-color: #fcd34d; color: #fcd34d; background: rgba(251,191,36,0.1); }
+        .grade-D { border-color: #fb923c; color: #fb923c; background: rgba(249,115,22,0.1); }
+        .grade-F { border-color: #f87171; color: #f87171; background: rgba(239,68,68,0.1); }
+        .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .data-table th { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 600; padding: 10px 14px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .data-table td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.05); color: rgba(255,255,255,0.8); }
+        .data-table tr:hover td { background: rgba(255,255,255,0.03); }
+        .swot-quadrant { padding: 20px; border-radius: 12px; }
+        .swot-S { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); }
+        .swot-W { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); }
+        .swot-O { background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.2); }
+        .swot-T { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); }
+        .canvas-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .canvas-cell { padding: 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; }
+        .canvas-cell .cell-title { font-size: 11px; font-weight: 600; color: #a78bfa; margin-bottom: 6px; }
+        .timeline-item { position: relative; padding-left: 36px; padding-bottom: 24px; }
+        .timeline-item::before { content: ''; position: absolute; left: 12px; top: 28px; bottom: 0; width: 2px; background: rgba(255,255,255,0.15); }
+        .timeline-item:last-child::before { display: none; }
+        .timeline-item .dot { position: absolute; left: 4px; top: 8px; width: 18px; height: 18px; border-radius: 50%; background: linear-gradient(135deg, #60a5fa, #a78bfa); border: 2px solid #24243e; }
+        .force-item { text-align: center; padding: 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; }
+        .no-data { text-align: center; padding: 30px; color: rgba(255,255,255,0.35); font-size: 14px; }
+        .cover-section { text-align: center; padding: 80px 40px; }
+        .cover-section h1 { font-size: 3rem; font-weight: 700; margin-bottom: 16px; }
+        .cover-section .grade-big { font-size: 5rem; font-weight: 800; line-height: 1; }
+        .check-pass { color: #4ade80; font-weight: bold; }
+        .check-fail { color: #f87171; font-weight: bold; }
+        .check-warn { color: #fcd34d; font-weight: bold; }
+        @media print {
+            body { background: #fff !important; color: #1a1a1a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .glass-card, .glass-card-sm { background: #f8f9fa !important; border-color: #dee2e6 !important; backdrop-filter: none !important; }
+            .gradient-text { -webkit-text-fill-color: #4f46e5 !important; }
+            .data-table th { background: #e9ecef !important; color: #495057 !important; }
+            .data-table td { color: #343a40 !important; border-color: #dee2e6 !important; }
+        }
+        @media (max-width: 768px) { .canvas-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div style="max-width:960px;margin:0 auto;padding:0 24px 60px;">
+        ${reportHTML}
+    </div>
+    <script>
+        // Re-render charts for exported HTML
+        ${generateChartScript(currentData)}
+    <\/script>
+</body>
+</html>`;
+
+    const blob = new Blob([fullHTML], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${productName}-可行性分析报告.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function generateChartScript(d) {
+    // Generate inline chart.js code for exported HTML
+    let scripts = '';
+    const fs = d.feasibility_score;
+    if (fs && fs.dimensions && fs.dimensions.length) {
+        const labels = JSON.stringify(fs.dimensions.map(dm => dm.name));
+        const data = JSON.stringify(fs.dimensions.map(dm => dm.max > 0 ? Math.round(dm.score/dm.max*100) : 0));
+        scripts += `
+        (function(){
+            var ctx = document.getElementById('chart-radar');
+            if (ctx) {
+                new Chart(ctx, { type: 'radar', data: { labels: ${labels}, datasets: [{ label: '得分率 %', data: ${data}, backgroundColor: 'rgba(96,165,250,0.15)', borderColor: '#60a5fa', pointBackgroundColor: '#60a5fa', pointRadius: 4, borderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { beginAtZero: true, max: 100, ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.08)' }, angleLines: { color: 'rgba(255,255,255,0.08)' }, pointLabels: { color: 'rgba(255,255,255,0.6)', font: { size: 10 } } } }, plugins: { legend: { display: false } } } });
+            }
+        })();`;
+    }
+    const fm = d.financial_model;
+    if (fm && fm.projections && fm.projections.length) {
+        const labels = JSON.stringify(fm.projections.map(p => p.month));
+        const rev = JSON.stringify(fm.projections.map(p => p.revenue));
+        const cost = JSON.stringify(fm.projections.map(p => p.cost));
+        const profit = JSON.stringify(fm.projections.map(p => p.profit));
+        scripts += `
+        (function(){
+            var ctx = document.getElementById('chart-financial');
+            if (ctx) {
+                new Chart(ctx, { type: 'line', data: { labels: ${labels}, datasets: [{ label: '收入', data: ${rev}, borderColor: '#4ade80', backgroundColor: 'rgba(34,197,94,0.1)', fill: true, tension: 0.3 }, { label: '成本', data: ${cost}, borderColor: '#f87171', backgroundColor: 'rgba(239,68,68,0.1)', fill: true, tension: 0.3 }, { label: '利润', data: ${profit}, borderColor: '#60a5fa', backgroundColor: 'rgba(96,165,250,0.1)', fill: true, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: 'rgba(255,255,255,0.5)' } }, y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: 'rgba(255,255,255,0.5)' } } }, plugins: { legend: { labels: { color: 'rgba(255,255,255,0.6)' } } } } });
+            }
+        })();`;
+    }
+    const ms = d.market_sizing;
+    if (ms && ms.tam && ms.sam && ms.som) {
+        const parseNum = s => { if (!s) return 0; return parseFloat(String(s).replace(/[^0-9.]/g,'')) || 0; };
+        const t = parseNum(ms.tam.value), s = parseNum(ms.sam.value), o = parseNum(ms.som.value);
+        if (t > 0 && s > 0 && o > 0) {
+            scripts += `
+            (function(){
+                var ctx = document.getElementById('chart-market-sizing');
+                if (ctx) {
+                    new Chart(ctx, { type: 'bar', data: { labels: ['TAM (总市场)', 'SAM (可服务市场)', 'SOM (可获得市场)'], datasets: [{ data: [${t},${s},${o}], backgroundColor: ['rgba(96,165,250,0.6)','rgba(167,139,250,0.6)','rgba(74,222,128,0.6)'], borderColor: ['#60a5fa','#a78bfa','#4ade80'], borderWidth: 2, borderRadius: 8 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: 'rgba(255,255,255,0.5)' } }, y: { grid: { display: false }, ticks: { color: 'rgba(255,255,255,0.6)' } } }, plugins: { legend: { display: false } } } });
+                }
+            })();`;
+        }
+    }
+    return scripts;
+}
+
+function downloadMarkdown() {
+    if (!currentData) return;
+    const d = currentData;
+    const meta = d.meta || {};
+    const es = d.executive_summary || {};
+    const km = es.key_metrics || {};
+    const productName = meta.product_name || 'report';
+    const date = meta.generated_at ? new Date(meta.generated_at).toLocaleDateString('zh-CN') : '';
+    const catLabels = {hardware:'硬件/消费品',saas:'SaaS/效率工具',service:'服务/咨询',content:'内容/社群',b2b:'B2B/企业级',platform:'平台/双边市场',community:'社群/平台'};
+
+    const analysisType = (meta && meta.analysis_type) || 'general';
+    const isCrowdfunding = analysisType === 'crowdfunding';
+
+    let md = `# ${productName} - 产品可行性分析报告\n\n`;
+    md += `> 分析日期：${date}\n`;
+    md += `> 品类：${catLabels[meta.category] || meta.category || '通用'}\n\n`;
+    md += `> **免责声明**：本报告由 AI 辅助生成，仅供决策参考，不构成投资建议。\n\n---\n\n`;
+
+    // Executive Summary
+    md += `## 执行摘要\n\n`;
+    if (es.one_line_summary) md += `**一句话概括**：${es.one_line_summary}\n\n`;
+    if (es.conclusion) md += `${es.conclusion}\n\n`;
+    if (km.grade) md += `| 指标 | 值 |\n|------|-----|\n| 评级 | ${km.grade} (${km.grade_label||''}) |\n| 总分 | ${km.total_score||'--'}/100 |\n`;
+    if (km.market_size_tam) md += `| TAM | ${km.market_size_tam} |\n`;
+    if (km.gross_margin_pct) md += `| 毛利率 | ${km.gross_margin_pct}% |\n`;
+    if (km.payback_months) md += `| 回本周期 | ${km.payback_months}月 |\n`;
+    md += '\n';
+    if (es.top_strengths) { md += '**核心优势**\n'; es.top_strengths.forEach(s => { md += `- ${s}\n`; }); md += '\n'; }
+    if (es.top_risks) { md += '**核心风险**\n'; es.top_risks.forEach(r => { md += `- ${r}\n`; }); md += '\n'; }
+    if (es.recommendation) md += `**下一步建议**：${es.recommendation}\n\n`;
+
+    // Project Profile
+    md += `## 项目画像\n\n`;
+    const pp = d.project_profile || {};
+    if (pp.product_description) md += `${pp.product_description}\n\n`;
+    if (pp.value_proposition) md += `**价值主张**：${pp.value_proposition}\n\n`;
+    if (pp.target_users) { md += '**目标用户**：'; pp.target_users.forEach(u => { md += `${u}、`; }); md = md.slice(0,-1) + '\n\n'; }
+    if (pp.core_features) { md += '**核心功能**\n'; pp.core_features.forEach(f => { md += `- ${f}\n`; }); md += '\n'; }
+
+    if (isCrowdfunding) {
+        // ---- Crowdfunding template ----
+
+        // SWOT
+        if (d.swot_analysis) {
+            md += `## SWOT 分析\n\n`;
+            [['优势','strengths'],['劣势','weaknesses'],['机会','opportunities'],['威胁','threats']].forEach(([l,k]) => {
+                const items = d.swot_analysis[k] || [];
+                md += `**${l}**\n`;
+                items.forEach(item => { md += `- ${item.item}（${item.impact||'--'}）：${item.evidence||''} ${item.action ? '→ '+item.action : ''}\n`; });
+                md += '\n';
+            });
+        }
+
+        // Case Studies
+        let csData = d.case_studies;
+        if (csData && !Array.isArray(csData) && csData.similar_cases) {
+            csData = csData.similar_cases;
+        }
+        if (csData && Array.isArray(csData) && csData.length) {
+            md += `## 竞品案例研究\n\n`;
+            csData.forEach(c => {
+                md += `### ${c.name}\n`;
+                md += `- 平台：${c.platform||'--'}  |  金额：${c.amount||'--'}  |  支持者：${c.backers||'--'}\n`;
+                md += `- 成功因素：${(c.success_factors||[]).join('、')||'--'}\n`;
+                md += `- 关联度：${c.relevance||'--'}\n`;
+                if (c.url) md += `- 链接：${c.url}\n`;
+                md += '\n';
+            });
+        }
+
+        // Risk Analysis
+        if (d.risk_analysis) {
+            md += `## 风险与失败模式\n\n`;
+            if (d.risk_analysis.project_risks) { md += '**项目风险**\n'; d.risk_analysis.project_risks.forEach(r => { md += `- [${r.level||'--'}] ${r.type}：${r.description||''} → ${r.mitigation||''}\n`; }); md += '\n'; }
+            if (d.risk_analysis.failure_patterns) { md += '**失败模式**\n'; d.risk_analysis.failure_patterns.forEach(fp => { md += `- ${fp.pattern}（${fp.frequency||'--'}）：${fp.prevention||''}\n`; }); md += '\n'; }
+        }
+
+        // Feasibility Score
+        if (d.feasibility_score) {
+            md += `## 可行性评分\n\n`;
+            const fs = d.feasibility_score;
+            md += `**总分**：${fs.total_score||0}/100  |  **评级**：${fs.grade||'?'}（${fs.grade_label||''}）\n\n`;
+            md += '| 维度 | 权重 | 得分 | 满分 | 说明 |\n|------|------|------|------|------|\n';
+            (fs.dimensions||[]).forEach(dm => { md += `| ${dm.name} | ${dm.weight} | ${dm.score} | ${dm.max} | ${dm.notes||''} |\n`; });
+            md += '\n';
+        }
+
+        // Crowdfunding
+        if (d.crowdfunding) {
+            md += `## 募资可行性评估\n\n`;
+            const cf = d.crowdfunding;
+            if (cf.recommended_platform) md += `**推荐平台**：${cf.recommended_platform}\n\n`;
+            if (cf.crowdfunding_score) md += `**募资评分**：${cf.crowdfunding_score.total_score||0}分（${cf.crowdfunding_score.grade||'?'} - ${cf.crowdfunding_score.grade_label||''}）\n\n`;
+            if (cf.pricing_strategy) { md += '**定价档位**\n'; cf.pricing_strategy.forEach(ps => { md += `- ${ps.tier}：¥${ps.price}${ps.limit?'（限量'+ps.limit+'）':''} - ${ps.description||''}\n`; }); md += '\n'; }
+            if (cf.supporter_estimates) {
+                const se = cf.supporter_estimates;
+                md += `**支持者估算**：目标 ¥${se.target_amount?.toLocaleString()||0}，均价 ¥${se.avg_pledge||0}，需 ${se.needed_supporters||0} 人，日均 ${se.daily_target||0} 人/天（${se.campaign_days||0}天）\n\n`;
+            }
+        }
+
+        // Timeline
+        if (d.timeline && d.timeline.phases) {
+            md += `## 时间规划\n\n`;
+            d.timeline.phases.forEach(p => {
+                md += `### ${p.phase}（${p.period}）\n`;
+                md += `目标：${p.goal}\n`;
+                if (p.tasks) { md += '任务：'; p.tasks.forEach(t => { md += `${t}、`; }); md = md.slice(0,-1)+'\n'; }
+                if (p.success_criteria) md += `成功标准：${p.success_criteria}\n`;
+                md += '\n';
+            });
+        }
+
+    } else {
+        // ---- General template ----
+
+        // Market Analysis
+        if (d.market_analysis) {
+            md += `## 市场分析\n\n`;
+            if (d.market_analysis.market_overview) md += `${d.market_analysis.market_overview}\n\n`;
+            if (d.market_analysis.trends) {
+                md += '**趋势**\n';
+                d.market_analysis.trends.forEach(t => { md += `- ${t.trend}（影响：${t.impact||'--'}）：${t.description||''}\n`; });
+                md += '\n';
+            }
+        }
+
+        // PEST
+        if (d.pest_analysis) {
+            md += `## PEST 分析\n\n`;
+            [['P','political'],['E','economic'],['S','social'],['T','technological']].forEach(([l,k]) => {
+                const p = d.pest_analysis[k] || {};
+                md += `**${l} - ${p.label||k}**（${p.impact||'--'}）\n`;
+                (p.factors||[]).forEach(f => { md += `- ${f}\n`; });
+                md += '\n';
+            });
+        }
+
+        // Porter Five Forces
+        if (d.porter_five_forces) {
+            md += `## 波特五力分析\n\n`;
+            ['supplier_power','buyer_power','new_entrants','substitutes','industry_rivalry'].forEach(k => {
+                const f = d.porter_five_forces[k] || {};
+                md += `- **${f.name||k}**：${f.level||'--'} - ${f.description||''}\n`;
+            });
+            md += '\n';
+        }
+
+        // SWOT
+        if (d.swot_analysis) {
+            md += `## SWOT 分析\n\n`;
+            [['优势','strengths'],['劣势','weaknesses'],['机会','opportunities'],['威胁','threats']].forEach(([l,k]) => {
+                const items = d.swot_analysis[k] || [];
+                md += `**${l}**\n`;
+                items.forEach(item => { md += `- ${item.item}（${item.impact||'--'}）：${item.evidence||''} ${item.action ? '→ '+item.action : ''}\n`; });
+                md += '\n';
+            });
+        }
+
+        // BMC
+        if (d.business_model_canvas) {
+            md += `## 商业模式画布\n\n`;
+            const b = d.business_model_canvas;
+            if (b.value_proposition) md += `**价值主张**：${b.value_proposition}\n\n`;
+            if (b.customer_segments) { md += '**客户细分**：'; b.customer_segments.forEach(c => { md += `${c}、`; }); md = md.slice(0,-1)+'\n\n'; }
+            if (b.channels) { md += '**渠道**：'; b.channels.forEach(c => { md += `${c}、`; }); md = md.slice(0,-1)+'\n\n'; }
+            if (b.revenue_streams) { md += '**收入来源**\n'; b.revenue_streams.forEach(r => { md += `- ${r.stream} (${r.model}, ${r.pricing||''})\n`; }); md += '\n'; }
+            if (b.cost_structure) { md += '**成本结构**\n'; b.cost_structure.forEach(c => { md += `- ${c.cost} (${c.type||''}, ${c.estimate||''})\n`; }); md += '\n'; }
+        }
+
+        // Case Studies
+        let csData = d.case_studies;
+        if (csData && !Array.isArray(csData) && csData.similar_cases) {
+            csData = csData.similar_cases;
+        }
+        if (csData && Array.isArray(csData) && csData.length) {
+            md += `## 竞品案例研究\n\n`;
+            csData.forEach(c => {
+                md += `### ${c.name}\n`;
+                md += `- 平台：${c.platform||'--'}  |  金额：${c.amount||'--'}  |  支持者：${c.backers||'--'}\n`;
+                md += `- 成功因素：${(c.success_factors||[]).join('、')||'--'}\n`;
+                md += `- 关联度：${c.relevance||'--'}\n`;
+                if (c.url) md += `- 链接：${c.url}\n`;
+                md += '\n';
+            });
+        }
+
+        // Market Sizing
+        if (d.market_sizing) {
+            md += `## 市场规模估算\n\n`;
+            const ms = d.market_sizing;
+            md += `| 层级 | 规模 | 说明 |\n|------|------|------|\n`;
+            md += `| TAM | ${ms.tam?.value||'--'} | ${ms.tam?.description||''} |\n`;
+            md += `| SAM | ${ms.sam?.value||'--'} | ${ms.sam?.description||''} |\n`;
+            md += `| SOM | ${ms.som?.value||'--'} | ${ms.som?.description||''} |\n\n`;
+            if (ms.assumptions) { md += '**假设**\n'; ms.assumptions.forEach(a => { md += `- ${a}\n`; }); md += '\n'; }
+        }
+
+        // Financial Model
+        if (d.financial_model) {
+            md += `## 财务模型\n\n`;
+            const fm = d.financial_model;
+            if (fm.break_even) md += `**盈亏平衡**：${fm.break_even.months}个月，需月收入 ¥${fm.break_even.monthly_revenue_needed?.toLocaleString()||'--'}\n\n`;
+            if (fm.projections) { md += '| 月份 | 收入 | 成本 | 利润 |\n|------|------|------|------|\n'; fm.projections.forEach(p => { md += `| ${p.month} | ¥${p.revenue?.toLocaleString()||0} | ¥${p.cost?.toLocaleString()||0} | ¥${p.profit?.toLocaleString()||0} |\n`; }); md += '\n'; }
+        }
+
+        // Growth Flywheel
+        if (d.growth_flywheel) {
+            md += `## 增长飞轮\n\n`;
+            const gf = d.growth_flywheel;
+            if (gf.flywheel_description) md += `${gf.flywheel_description}\n\n`;
+            const aarrr = gf.aarrr || {};
+            [['获客','acquisition'],['激活','activation'],['留存','retention'],['收入','revenue'],['推荐','referral']].forEach(([l,k]) => {
+                const s = aarrr[k] || {};
+                md += `**${l}**：${s.notes||''}`;
+                if (s.metrics) md += ` [${s.metrics.join(', ')}]`;
+                md += '\n';
+            });
+            md += '\n';
+        }
+
+        // Tech Architecture
+        if (d.tech_architecture) {
+            md += `## 技术架构评估\n\n`;
+            ['tech_maturity','tech_complexity','supply_chain','security','scalability'].forEach(k => {
+                const t = d.tech_architecture[k] || {};
+                md += `- **${t.name||k}**：${t.level||'--'} - ${t.notes||''}\n`;
+            });
+            md += `\n整体风险等级：${d.tech_architecture.risk_level||'--'}\n\n`;
+        }
+
+        // Risk Analysis
+        if (d.risk_analysis) {
+            md += `## 风险与失败模式\n\n`;
+            if (d.risk_analysis.project_risks) { md += '**项目风险**\n'; d.risk_analysis.project_risks.forEach(r => { md += `- [${r.level||'--'}] ${r.type}：${r.description||''} → ${r.mitigation||''}\n`; }); md += '\n'; }
+            if (d.risk_analysis.failure_patterns) { md += '**失败模式**\n'; d.risk_analysis.failure_patterns.forEach(fp => { md += `- ${fp.pattern}（${fp.frequency||'--'}）：${fp.prevention||''}\n`; }); md += '\n'; }
+        }
+
+        // Feasibility Score
+        if (d.feasibility_score) {
+            md += `## 可行性评分\n\n`;
+            const fs = d.feasibility_score;
+            md += `**总分**：${fs.total_score||0}/100  |  **评级**：${fs.grade||'?'}（${fs.grade_label||''}）\n\n`;
+            md += '| 维度 | 权重 | 得分 | 满分 | 说明 |\n|------|------|------|------|------|\n';
+            (fs.dimensions||[]).forEach(dm => { md += `| ${dm.name} | ${dm.weight} | ${dm.score} | ${dm.max} | ${dm.notes||''} |\n`; });
+            md += '\n';
+        }
+
+        // Exit Strategy
+        if (d.exit_strategy) {
+            md += `## 退出策略与止损\n\n`;
+            if (d.exit_strategy.options) { md += '**退出选项**\n'; d.exit_strategy.options.forEach(o => { md += `- ${o.option}：条件=${o.condition||'--'}，回报=${o.return||'--'}，风险=${o.risk||'--'}\n`; }); md += '\n'; }
+            if (d.exit_strategy.stop_loss_triggers) { md += '**止损条件**\n'; d.exit_strategy.stop_loss_triggers.forEach(sl => { md += `- ${sl.type}：${sl.indicator} → ${sl.threshold} → ${sl.action}\n`; }); md += '\n'; }
+        }
+
+        // Timeline
+        if (d.timeline && d.timeline.phases) {
+            md += `## 时间规划\n\n`;
+            d.timeline.phases.forEach(p => {
+                md += `### ${p.phase}（${p.period}）\n`;
+                md += `目标：${p.goal}\n`;
+                if (p.tasks) { md += '任务：'; p.tasks.forEach(t => { md += `${t}、`; }); md = md.slice(0,-1)+'\n'; }
+                if (p.success_criteria) md += `成功标准：${p.success_criteria}\n`;
+                md += '\n';
+            });
+        }
+    }
+
+    md += `\n---\n\n> 报告生成时间：${new Date().toLocaleString('zh-CN')}\n`;
+
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${productName}-可行性分析报告.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// Sample data for testing
+// ============================================================
+function loadSample() {
+    const sample = {
+        meta: {
+            generated_at: "2026-06-26T22:00:00",
+            product_name: "AI 智能翻译耳机",
+            category: "hardware",
+            analyzer: "GPT-4o",
+            schema_version: "2.0"
+        },
+        executive_summary: {
+            one_line_summary: "低成本AI翻译耳机，瞄准跨境商务场景，但竞争激烈且技术壁垒不足。",
+            conclusion: "翻译耳机市场需求真实存在，但竞争已白热化。Timekettle、Travis 等成熟品牌占据主流市场，新进入者需要找到差异化切入点。建议聚焦特定垂直场景（如医疗翻译、旅游陪护）而非通用翻译。",
+            key_metrics: { total_score: 64, grade: "C", grade_label: "需要重新定位", market_size_tam: "300亿", market_size_sam: "30亿", market_size_som: "1.5亿", gross_margin_pct: 42, payback_months: 18 },
+            top_strengths: ["真实市场痛点，商务跨语言沟通需求持续增长", "AI翻译技术日趋成熟，可利用现有API快速MVP"],
+            top_risks: ["Timekettle等成熟品牌已占据用户心智", "硬件产品需要大量前期资金投入"],
+            recommendation: "建议先做30人深度访谈验证垂直场景需求，再决定是否进入硬件开发。可考虑从App/Web切入验证需求，降低前期投入。"
+        },
+        project_profile: {
+            product_description: "一款支持40+语言实时翻译的蓝牙耳机，搭载AI大模型翻译引擎，目标成本500元/副。主打跨境商务、旅游等高频跨语言沟通场景。",
+            target_users: ["跨境电商卖家", "国际商务人士", "出境旅游者"],
+            value_proposition: "用一杯咖啡的价格，获得专业级翻译体验，消除跨语言沟通障碍。",
+            core_features: ["40+语言实时翻译", "离线翻译模式", "降噪通话", "超长续航12h"],
+            version_plan: [
+                { version: "MVP", scope: "蓝牙耳机+在线翻译（中英日韩）", timeline: "3个月" },
+                { version: "V2", scope: "离线翻译+10种语言+降噪升级", timeline: "6个月" }
+            ]
+        },
+        case_studies: {
+            similar_cases: [
+                { name: "Timekettle M3", platform: "kickstarter", amount: "$1,200万", backers: 15000, success_factors: ["专业翻译品牌", "线下渠道成熟", "产品体验好"], relevance: "直接竞品，翻译耳机标杆", url: "https://www.timekettle.com" },
+                { name: "Travis Badge", platform: "indiegogo", amount: "$280万", backers: 4200, success_factors: ["旅行场景定位", "便携设计", "社交媒体传播"], relevance: "类似产品形态，旅行场景", url: "https://www.travisneck.com" },
+                { name: "AI翻译耳机 Air", platform: "zeczec", amount: "¥2,100,000", backers: 4321, success_factors: ["价格优势", "本地化推广", "早鸟策略"], relevance: "台湾募资平台同类产品", url: "https://www.zeczec.com" }
+            ]
+        },
+        market_analysis: {
+            market_overview: "全球翻译设备市场预计2027年达到45亿美元，CAGR约12%。翻译耳机是增长最快的细分品类，AI大模型的进步大幅提升了翻译质量。",
+            trends: [
+                { trend: "AI大模型翻译", description: "GPT-4等大模型使翻译质量接近人类水平", impact: "高" },
+                { trend: "离线AI芯片", description: "边缘AI芯片使离线翻译成为可能", impact: "中" },
+                { trend: "旅游市场复苏", description: "疫情后国际旅行恢复带动翻译设备需求", impact: "高" }
+            ],
+            market_segments: [
+                { segment: "商务翻译", share_pct: 35, growth_rate: "15%" },
+                { segment: "旅游翻译", share_pct: 30, growth_rate: "18%" },
+                { segment: "学习辅助", share_pct: 20, growth_rate: "10%" },
+                { segment: "其他", share_pct: 15, growth_rate: "8%" }
+            ]
+        },
+        pest_analysis: {
+            political: { label: "政治", factors: ["中美科技竞争影响芯片供应", "各国数据跨境法规趋严"], impact: "负面" },
+            economic: { label: "经济", factors: ["全球消费电子市场放缓", "汇率波动影响进口成本"], impact: "负面" },
+            social: { label: "社会", factors: ["全球化和跨国交流增加", "Z世代对科技产品接受度高"], impact: "正面" },
+            technological: { label: "技术", factors: ["大语言模型翻译质量飞跃", "边缘AI芯片成本下降", "蓝牙LE Audio标准普及"], impact: "正面" }
+        },
+        porter_five_forces: {
+            supplier_power: { name: "供应商议价能力", level: "中", description: "芯片和传感器供应商相对集中，但替代方案多" },
+            buyer_power: { name: "购买者议价能力", level: "高", description: "消费者选择多，品牌忠诚度低" },
+            new_entrants: { name: "新进入者威胁", level: "高", description: "技术门槛降低，白牌方案成熟" },
+            substitutes: { name: "替代品威胁", level: "高", description: "手机App翻译功能免费且越来越好" },
+            industry_rivalry: { name: "行业竞争", level: "高", description: "Timekettle、Travis、科大讯飞等强敌环伺" }
+        },
+        swot_analysis: {
+            strengths: [
+                { item: "低成本优势", impact: "高", evidence: "目标成本500元 vs 竞品1500+", action: "定价策略以性价比为卖点" },
+                { item: "AI大模型技术红利", impact: "高", evidence: "可接入OpenAI/DeepL等API", action: "技术营销突出翻译质量" }
+            ],
+            weaknesses: [
+                { item: "品牌知名度为零", impact: "高", evidence: "全新品牌无用户基础", action: "通过KOL合作建立初始信任" },
+                { item: "硬件经验不足", impact: "中", evidence: "团队无消费电子产品经验", action: "与OEM厂商合作降低风险" }
+            ],
+            opportunities: [
+                { item: "垂直场景未满足", impact: "高", evidence: "医疗翻译、法律翻译等场景缺乏专业产品", action: "聚焦一个垂直场景做深" },
+                { item: "东南亚新兴市场", impact: "中", evidence: "东南亚多语种商务需求增长", action: "本地化推广策略" }
+            ],
+            threats: [
+                { item: "手机App替代", impact: "高", evidence: "Google Translate等免费方案持续改进", action: "强调耳机形态的便利性和隐私性" },
+                { item: "大厂进入", impact: "中", evidence: "苹果、三星可能内置高级翻译功能", action: "速度优先，抢占时间窗口" }
+            ]
+        },
+        business_model_canvas: {
+            value_proposition: "低成本、高品质的AI翻译体验，消除跨语言沟通障碍",
+            customer_segments: ["跨境电商卖家", "国际商务人士", "出境旅游者"],
+            channels: ["电商平台（淘宝/京东）", "社交媒体营销", "KOL测评合作", "线下体验店"],
+            customer_relationships: ["社群运营", "OTA固件更新", "会员翻译时长包"],
+            revenue_streams: [{ stream: "硬件销售", model: "一次性购买", pricing: "¥599-899" }, { stream: "翻译服务订阅", model: "SaaS订阅", pricing: "¥29/月" }],
+            key_resources: ["AI翻译API合作伙伴", "OEM供应链", "品牌与社群"],
+            key_activities: ["产品设计与开发", "供应链管理", "品牌营销"],
+            key_partnerships: ["AI翻译API提供商", "OEM工厂", "KOL/MCN机构"],
+            cost_structure: [{ cost: "BOM成本", type: "可变", estimate: "¥250/副" }, { cost: "研发人力", type: "固定", estimate: "¥8万/月" }, { cost: "营销费用", type: "可变", estimate: "营收20%" }]
+        },
+        market_sizing: {
+            tam: { label: "总市场", value: "300亿", description: "全球翻译设备市场（含企业级）" },
+            sam: { label: "可服务市场", value: "30亿", description: "消费级翻译耳机市场" },
+            som: { label: "可获得市场", value: "1.5亿", description: "首年目标：中国电商渠道销售" },
+            assumptions: ["中国消费级翻译耳机年出货约100万台", "平均售价600元", "首年市占率目标2.5%"]
+        },
+        financial_model: {
+            cost_structure: [
+                { item: "研发人力（4人）", type: "固定", monthly: 80000, notes: "含软件+硬件工程师" },
+                { item: "办公与行政", type: "固定", monthly: 15000, notes: "共享办公+法务" },
+                { item: "BOM成本", type: "可变", monthly: 0, notes: "按销量：¥250/副" },
+                { item: "营销投放", type: "可变", monthly: 20000, notes: "社交媒体+KOL" }
+            ],
+            revenue_model: [
+                { item: "耳机销售", unit_price: 599, monthly_units: 50, notes: "初期月销50副" }
+            ],
+            break_even: { months: 18, monthly_revenue_needed: 115000, description: "按月销200副，收入12万/月" },
+            projections: [
+                { month: "M1", revenue: 0, cost: 115000, profit: -115000 },
+                { month: "M3", revenue: 15000, cost: 110000, profit: -95000 },
+                { month: "M6", revenue: 60000, cost: 95000, profit: -35000 },
+                { month: "M12", revenue: 120000, cost: 85000, profit: 35000 },
+                { month: "M18", revenue: 180000, cost: 80000, profit: 100000 }
+            ]
+        },
+        growth_flywheel: {
+            flywheel_description: "通过KOL测评获取初始用户 → 用户好评产生口碑传播 → 口碑带来更多用户 → 更多用户吸引更多KOL合作 → 形成增长飞轮。",
+            aarrr: {
+                acquisition: { name: "获客", metrics: ["CAC", "渠道ROI"], notes: "以KOL测评为核心获客渠道，目标CAC < ¥200" },
+                activation: { name: "激活", metrics: ["首单转化率", "首次使用翻译时长"], notes: "开箱即用，首次使用10分钟以上为激活" },
+                retention: { name: "留存", metrics: ["D7/D30留存率", "周活"], notes: "通过OTA更新和翻译质量提升保持留存" },
+                revenue: { name: "收入", metrics: ["ARPU", "付费转化率"], notes: "硬件一次性收入为主，翻译订阅为增值" },
+                referral: { name: "推荐", metrics: ["NPS", "病毒系数"], notes: "目标NPS > 40，社交分享机制" }
+            }
+        },
+        tech_architecture: {
+            tech_maturity: { name: "技术成熟度", level: "高", notes: "AI翻译API成熟，蓝牙耳机方案标准化" },
+            tech_complexity: { name: "技术复杂度", level: "中", notes: "硬件集成有一定复杂度，但非核心技术壁垒" },
+            supply_chain: { name: "供应链可靠性", level: "中", notes: "深圳OEM方案成熟，但芯片供应需关注" },
+            security: { name: "安全合规", level: "中", notes: "需处理用户语音数据，隐私合规重要" },
+            scalability: { name: "扩展性", level: "高", notes: "软件可快速迭代，硬件换代周期较长" },
+            risk_level: "中",
+            notes: "整体技术风险可控，核心挑战在供应链管理和数据隐私合规"
+        },
+        feasibility_score: {
+            category_weights: "hardware",
+            dimensions: [
+                { name: "痛点强度", weight: 15, score: 12, max: 15, notes: "真实痛点，但手机App部分替代" },
+                { name: "目标用户清晰度", weight: 10, score: 8, max: 10, notes: "用户群明确，但需求强度参差" },
+                { name: "竞争壁垒", weight: 10, score: 4, max: 10, notes: "无明显壁垒，易被模仿" },
+                { name: "产品可演示性", weight: 10, score: 8, max: 10, notes: "翻译效果可直观演示" },
+                { name: "技术/生产可行性", weight: 10, score: 6, max: 10, notes: "技术成熟但团队硬件经验不足" },
+                { name: "合规与信任", weight: 10, score: 5, max: 10, notes: "需处理语音数据，隐私合规待建立" },
+                { name: "商业模式", weight: 10, score: 7, max: 10, notes: "硬件+订阅模式合理，但毛利率需验证" },
+                { name: "市场推广可行性", weight: 10, score: 5, max: 10, notes: "KOL渠道可行但成本高" },
+                { name: "团队匹配度", weight: 10, score: 5, max: 10, notes: "软件能力强但硬件经验不足" },
+                { name: "证据完整度", weight: 5, score: 4, max: 5, notes: "有竞品参考但缺乏用户访谈数据" }
+            ],
+            total_score: 64,
+            grade: "C",
+            grade_label: "需要重新定位"
+        },
+        category_checks: {
+            category: "hardware",
+            checks: [
+                { item: "供应链韧性", status: "warn", notes: "深圳OEM方案成熟但芯片供应需长期关注" },
+                { item: "BOM成本与毛利", status: "pass", notes: "BOM 250元 vs 售价599元，毛利率58%" },
+                { item: "开模周期", status: "warn", notes: "定制外壳开模需6-8周，增加时间成本" },
+                { item: "物流与关税", status: "pass", notes: "内销为主，物流成本低" },
+                { item: "质量品控", status: "fail", notes: "团队缺乏消费电子品控经验" },
+                { item: "售后体系", status: "warn", notes: "需建立完善的退换货和维修流程" }
+            ]
+        },
+        timeline: {
+            phases: [
+                { phase: "验证期", period: "0-1个月", goal: "验证垂直场景需求", tasks: ["30人深度访谈", "分析竞品定价策略", "确定OEM合作伙伴"], success_criteria: "找到差异化切入点" },
+                { phase: "开发期", period: "1-4个月", goal: "开发MVP原型", tasks: ["硬件原型制作", "翻译SDK集成", "固件开发"], success_criteria: "可演示的功能原型" },
+                { phase: "小批量试产", period: "4-6个月", goal: "100台试产+内测", tasks: ["小批量生产100台", "种子用户内测", "收集反馈迭代"], success_criteria: "用户满意度 > 7/10" },
+                { phase: "募资/预售", period: "6-7个月", goal: "嘖嘖募资验证", tasks: ["嘖嘖提案准备", "营销素材制作", "预热邮件列表"], success_criteria: "募资达标" },
+                { phase: "量产", period: "7-10个月", goal: "正式量产交付", tasks: ["量产1000台", "电商平台上线", "KOL推广"], success_criteria: "月销200台" }
+            ]
+        },
+        exit_strategy: {
+            options: [
+                { option: "被收购", condition: "年营收 > 5000万", return: "3-5x", risk: "低概率" },
+                { option: "持续经营", condition: "稳定盈利", return: "持续现金流", risk: "中等" },
+                { option: "转型SaaS", condition: "硬件验证后转向纯软件", return: "更高毛利", risk: "中等" }
+            ],
+            stop_loss_triggers: [
+                { type: "财务止损", indicator: "现金储备", threshold: "低于3个月运营成本", action: "停止硬件开发，转向纯软件" },
+                { type: "市场止损", indicator: "预售转化率", threshold: "低于2%", action: "暂停量产，重新评估定位" },
+                { type: "时间止损", indicator: "开发进度", threshold: "落后计划超过3个月", action: "缩减功能范围或终止项目" }
+            ]
+        },
+        risk_analysis: {
+            project_risks: [
+                { type: "竞争风险", description: "Timekettle等品牌大幅降价应对", level: "高", mitigation: "差异化定位+垂直场景聚焦" },
+                { type: "供应链风险", description: "芯片缺货或涨价", level: "中", mitigation: "多供应商策略+安全库存" },
+                { type: "质量风险", description: "首批产品品控问题", level: "高", mitigation: "严格OEM验厂+小批量试产" },
+                { type: "合规风险", description: "语音数据处理涉及隐私", level: "中", mitigation: "端到端加密+数据本地化" }
+            ],
+            failure_patterns: [
+                { pattern: "供应链/履约失败", frequency: "35%", prevention: "与有经验的OEM合作，预留缓冲时间", relevance: "高风险：团队无硬件经验" },
+                { pattern: "定价失误", frequency: "20%", prevention: "竞品定价分析+用户价格敏感度测试", relevance: "中风险：成本结构清晰但定价需验证" },
+                { pattern: "冷启动失败", frequency: "25%", prevention: "预热期积累用户+KOL合作", relevance: "中风险：有KOL渠道但需执行到位" },
+                { pattern: "产品差异化不足", frequency: "30%", prevention: "垂直场景深度聚焦", relevance: "高风险：通用翻译场景竞争激烈" }
+            ]
+        },
+        crowdfunding: {
+            recommended_platform: "zeczec",
+            platform_comparison: [
+                { platform: "zeczec", match_score: 85, pros: ["台湾本地化好", "费用合理", "硬件品类成熟"], cons: ["市场规模较小", "需要台湾实体"], fee: "8%+3%", success_rate: "45%" },
+                { platform: "kickstarter", match_score: 70, pros: ["全球受众", "品牌影响力大"], cons: ["竞争激烈", "费用高", "需要海外实体"], fee: "5%+3%", success_rate: "38%" },
+                { platform: "makuake", match_score: 60, pros: ["日本市场", "硬件类目强"], cons: ["需要日语支持", "日本物流"], fee: "8%+3%", success_rate: "42%" }
+            ],
+            crowdfunding_score: {
+                dimensions: [
+                    { name: "产品展示力", weight: 20, score: 16, max: 20 },
+                    { name: "信任证据", weight: 20, score: 10, max: 20 },
+                    { name: "定价合理性", weight: 15, score: 12, max: 15 },
+                    { name: "推广准备度", weight: 15, score: 8, max: 15 },
+                    { name: "履约能力", weight: 15, score: 7, max: 15 },
+                    { name: "平台匹配度", weight: 15, score: 10, max: 15 }
+                ],
+                total_score: 63,
+                grade: "C",
+                grade_label: "需要补强"
+            },
+            pricing_strategy: [
+                { tier: "早鸟版", price: 399, limit: 100, description: "基础翻译功能，中英日韩" },
+                { tier: "标准版", price: 599, limit: 500, description: "完整功能+降噪+长续航" },
+                { tier: "豪华版", price: 899, limit: 200, description: "全套配件+2年翻译订阅" }
+            ],
+            supporter_estimates: {
+                target_amount: 500000,
+                avg_pledge: 250,
+                needed_supporters: 2000,
+                daily_target: 67,
+                campaign_days: 30
+            },
+            delivery_plan: {
+                estimated_delivery: "7个月后",
+                milestones: [
+                    { milestone: "原型完成", date: "M2", status: "待定" },
+                    { milestone: "小批量试产", date: "M4", status: "待定" },
+                    { milestone: "量产开始", date: "M6", status: "待定" },
+                    { milestone: "发货", date: "M7", status: "待定" }
+                ]
+            },
+            promotion_strategy: {
+                pre_launch: ["社交媒体积累2000粉丝", "3位KOL达成合作意向", "邮件列表500+订阅"],
+                during_campaign: ["首日冲刺策略", "每周更新进度", "互动回复评论"],
+                final_push: ["最后48小时紧迫感营销", "追加限量福利"]
+            }
+        }
+    };
+    document.getElementById('json-input').value = JSON.stringify(sample, null, 2);
+}
+
+// 自动加载模式：如果URL中有 ?json= 参数，自动加载并渲染
+(function(){
+    var params = new URLSearchParams(window.location.search);
+    var jsonUrl = params.get('json');
+    if (jsonUrl) {
+        // 隐藏输入区域
+        var inputArea = document.getElementById('input-area');
+        if (inputArea) inputArea.style.display = 'none';
+        
+        // 加载JSON
+        fetch(jsonUrl)
+            .then(function(r) { return r.text(); })
+            .then(function(text) {
+                var ta = document.getElementById('json-input');
+                if (ta) ta.value = text;
+                // 等待Chart.js加载完成
+                setTimeout(function() {
+                    if (typeof renderReport === 'function') {
+                        try { renderReport(); }
+                        catch(e) { console.error('Render error:', e); }
+                    }
+                }, 1500);
+            })
+            .catch(function(e) { console.error('Failed to load JSON:', e); });
+    }
+})();
+</script>
+</body>
+</html>
